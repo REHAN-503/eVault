@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+
+# Git and OS
+.git/
+.gitignore
+.github/
+.DS_Store
+
+# Environment
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+
+# Local build output (prevent overriding container builds)
+dist/
+build/
+.tsbuildinfo
+
+# Coverage and Testing
+coverage/
+.nyc_output/
+tests/
+
+# Documentation and meta files
+docs/
+docker/
+README.md
+LICENSE
+CHANGELOG.md
+
+# Config files not needed at runtime
+.eslintrc*
+.eslintcache
+.prettierrc*
+.husky/
+.gitattributes
+.editorconfig
+docker-compose*.yml
+Dockerfile
+Dockerfile.*
+.dockerignore
+
+# Uploads
+uploads/*
+!uploads/.gitkeep

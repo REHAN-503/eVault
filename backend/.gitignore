@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.*
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Build output
+dist/
+build/
+.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.pem
+
+# IDE
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Prisma
+prisma/migrations/**/migration_lock.toml
+
+# Uploads (keep folder via .gitkeep)
+uploads/*
+!uploads/.gitkeep
+
+# Docker
+docker/postgres-data/
+docker-compose.override.yml
+
+# Formatting & Linting
+.eslintcache
+
+# Husky
+.husky/_/

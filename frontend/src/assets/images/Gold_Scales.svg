@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <!-- Background Gradient for the shield -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#162947"/>
+      <stop offset="100%" stop-color="#0a1221"/>
+    </linearGradient>
+    <!-- Gold Border Gradient -->
+    <linearGradient id="borderGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ebd197"/>
+      <stop offset="25%" stop-color="#c9a24b"/>
+      <stop offset="75%" stop-color="#8a6c2d"/>
+      <stop offset="100%" stop-color="#d4af37"/>
+    </linearGradient>
+    <!-- Gold Icon Fill Gradient -->
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fdf2d0"/>
+      <stop offset="40%" stop-color="#c9a24b"/>
+      <stop offset="100%" stop-color="#8a6c2d"/>
+    </linearGradient>
+    <!-- Drop Shadow for Icon -->
+    <filter id="iconShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#iconShadow)">
+    <!-- Shield Background -->
+    <path d="M 50 8 L 16 16 L 16 45 C 16 68 30 86 50 94 C 70 86 84 68 84 45 L 84 16 Z" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="3" stroke-linejoin="round" />
+    <!-- Inner Shield Rim -->
+    <path d="M 50 12 L 20 19 L 20 45 C 20 65 32 81 50 89 C 68 81 80 65 80 45 L 80 19 Z" fill="transparent" stroke="url(#borderGrad)" stroke-width="1" stroke-linejoin="round" />
+  </g>
+
+  <!-- Balance Scales -->
+  <g filter="url(#iconShadow)">
+    <!-- Base -->
+    <path d="M 40 82 L 60 82 L 56 76 L 44 76 Z" fill="url(#iconGrad)" />
+    <!-- Stand -->
+    <rect x="47" y="24" width="6" height="52" fill="url(#iconGrad)" />
+    <!-- Top knob -->
+    <circle cx="50" cy="20" r="4" fill="url(#iconGrad)" />
+    <!-- Beam -->
+    <path d="M 24 38 Q 50 30 76 38" fill="transparent" stroke="url(#iconGrad)" stroke-width="4" stroke-linecap="round" />
+    <circle cx="50" cy="34" r="5" fill="#0a1221" stroke="url(#iconGrad)" stroke-width="3" />
+    
+    <!-- Left Scale Strings -->
+    <path d="M 24 38 L 16 60 M 24 38 L 32 60" stroke="url(#iconGrad)" stroke-width="1.5" />
+    <!-- Left Scale Bowl -->
+    <path d="M 14 60 Q 24 70 34 60 Z" fill="url(#iconGrad)" />
+
+    <!-- Right Scale Strings -->
+    <path d="M 76 38 L 68 60 M 76 38 L 84 60" stroke="url(#iconGrad)" stroke-width="1.5" />
+    <!-- Right Scale Bowl -->
+    <path d="M 66 60 Q 76 70 86 60 Z" fill="url(#iconGrad)" />
+  </g>
+</svg>

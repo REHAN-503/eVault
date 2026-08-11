@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # ---- PostgreSQL ----
+  postgres:
+    image: postgres:16-alpine
+    container_name: evault-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: evault
+      POSTGRES_PASSWORD: evault_secret
+      POSTGRES_DB: evault_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U evault -d evault_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---- eVault API ----
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: evault-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://evault:evault_secret@postgres:5432/evault_db?schema=public
+      JWT_SECRET: change-me-in-production-use-a-long-random-string
+      JWT_ACCESS_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 7d
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - '3000:3000'
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  postgres_data:
+  uploads_data:

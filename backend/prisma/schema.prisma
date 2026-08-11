@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String             @id @default(uuid())
+  email        String             @unique
+  passwordHash String
+  role         Role
+  fullName     String
+  status       UserStatus @default(PENDING)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  auditLogs    AuditLog[]
+  documents    DocumentMetadata[]
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String
+  expiresAt        DateTime
+  createdAt        DateTime  @default(now())
+  revokedAt        DateTime?
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshTokenHash])
+  @@map("sessions")
+}
+
+model DocumentMetadata {
+  id          String     @id @default(uuid())
+  docId       String     @unique
+  cid         String
+  currentHash String
+  ownerId     String
+  version     Int        @default(1)
+  filename    String
+  mimetype    String
+  sizeBytes   Int
+  isDeleted   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  auditLogs   AuditLog[]
+  owner       User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@index([docId])
+  @@map("document_metadata")
+}
+
+model AuditLog {
+  id        String           @id @default(uuid())
+  docId     String
+  userId    String
+  action    AuditAction
+  timestamp DateTime         @default(now())
+  metadata  Json?
+  document  DocumentMetadata @relation(fields: [docId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([docId])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+enum Role {
+  LAWYER
+  JUDGE
+  CLIENT
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AuditAction {
+  UPLOAD
+  VIEW
+  SHARE
+  REVOKE
+  UPDATE
+}

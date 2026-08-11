@@ -1,0 +1,25 @@
+# Dockerfile for SIH1284 Off-Chain Storage Service
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json tsconfig.json ./
+RUN npm ci
+
+COPY src/ ./src/
+RUN npm run build
+
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+ENV NODE_ENV=production
+ENV STORAGE_SERVICE_PORT=4001
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 4001
+
+CMD ["node", "dist/storage/server.js"]

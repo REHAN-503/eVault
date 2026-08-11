@@ -1,0 +1,24 @@
+{
+  "name": "evault-chaincode",
+  "version": "1.0.0",
+  "description": "SIH1284 eVault blockchain layer: AccessControlContract, DocumentRegistryContract, AuditLogContract",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test:src": "tsx --test src/*.test.ts",
+    "package": "npm run build && npm shrinkwrap --production",
+    "start": "fabric-chaincode-node server --chaincode-address=$CHAINCODE_SERVER_ADDRESS --chaincode-id=$CHAINCODE_ID --chaincode-tls-key= --chaincode-tls-client-cacert= --chaincode-tls-cert="
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fabric-contract-api": "^2.5.8",
+    "fabric-shim": "^2.5.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.11",
+    "typescript": "^7.0.2"
+  }
+}

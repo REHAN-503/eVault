@@ -1,0 +1,22 @@
+{
+  "name": "evault-gateway",
+  "version": "1.0.0",
+  "description": "Node.js client connecting evault-backend to Hyperledger Fabric",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test:src": "tsx --test src/*.test.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@hyperledger/fabric-gateway": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.11",
+    "typescript": "^7.0.2"
+  }
+}
