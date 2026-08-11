@@ -14,17 +14,16 @@
   ::selection {
     @apply bg-seal/20;
   }
-  
+
   /* Premium Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
-    height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: transparent;
+    @apply bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate/30 rounded-full hover:bg-slate/50 transition-colors;
+    @apply bg-slate-500/20 rounded-full hover:bg-slate-500/30 transition-colors;
   }
 }
 
