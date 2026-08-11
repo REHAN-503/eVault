@@ -11,11 +11,10 @@ import axios from 'axios';
 // 3. Nothing else changes — every function in src/api/*.js already calls the
 //    REST paths the gateway is expected to expose (see comments in each file).
 // ---------------------------------------------------------------------------
-
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
+export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   timeout: 15000,
 });
 
@@ -96,8 +95,14 @@ client.interceptors.response.use(
       }
     }
 
-    const message =
+    let message =
       err?.response?.data?.message || err?.message || 'Request failed';
+      
+    const errorDetails = err?.response?.data?.error?.details;
+    if (Array.isArray(errorDetails) && errorDetails.length > 0) {
+      message = errorDetails.map(d => d.message).join(', ');
+    }
+
     return Promise.reject(new Error(message));
   }
 );

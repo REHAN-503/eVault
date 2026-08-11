@@ -55,7 +55,7 @@ const CONFIG = {
     CHANNEL_NAME: process.env.FABRIC_CHANNEL_NAME ?? 'evaultchannel',
     CHAINCODE_NAME: process.env.FABRIC_CHAINCODE_NAME ?? 'evaultcc',
     CRYPTO_PATH: process.env.FABRIC_CRYPTO_PATH ??
-        path.join(process.env.EVAULT_ROOT ?? path.join(process.env.HOME ?? '.', 'eVault'), 'fabric', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com'),
+        path.resolve(__dirname, '../../', 'fabric', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com'),
 };
 exports.GATEWAY_CONFIG = CONFIG;
 let cachedGateway;

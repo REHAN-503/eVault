@@ -107,7 +107,7 @@ export default function DocumentDetail() {
                 Case: {doc.caseNo}
               </span>
               <StatusPill status={doc.status} />
-              {(user.role === 'client' || user.role === 'judge') && (
+              {(user.role === 'CLIENT' || user.role === 'JUDGE') && (
                 <span className="text-[10px] font-bold tracking-widest uppercase bg-slate/10 text-slate px-2 py-0.5 rounded border border-slate/20 flex items-center gap-1">
                   <Lock size={10} /> Read Only
                 </span>
@@ -139,7 +139,7 @@ export default function DocumentDetail() {
             <button onClick={handleDownload} className="w-full flex items-center justify-center gap-2 rounded-md bg-ink text-white px-4 py-2.5 text-sm font-medium hover:bg-ink/90 transition-colors shadow-sm">
               <Download size={16} /> Download Decrypted
             </button>
-            {(user.role === 'lawyer' || user.role === 'admin') && (
+            {(user.role === 'LAWYER' || user.role === 'ADMIN') && (
               <div className="flex gap-2">
                 <button onClick={() => setUpdateOpen(true)} className="flex-1 flex items-center justify-center gap-1.5 rounded-md bg-white border border-line text-ink px-3 py-2 text-sm font-medium hover:bg-slate/5 transition-colors shadow-sm">
                   <FileSignature size={14} /> Update
@@ -218,7 +218,7 @@ export default function DocumentDetail() {
                 <span className="text-xs font-mono text-slate bg-slate/10 px-2 py-0.5 rounded">READ</span>
               </div>
             </div>
-            {(user.role === 'lawyer' || user.role === 'admin') && (
+            {(user.role === 'LAWYER' || user.role === 'ADMIN') && (
               <div className="p-3 bg-[#FAFAFA]">
                 <button onClick={() => setAccessOpen(true)} className="w-full py-1.5 text-xs font-medium text-ink border border-line rounded bg-white hover:bg-slate/5 transition-colors">
                   Modify Access
@@ -227,7 +227,7 @@ export default function DocumentDetail() {
             )}
           </div>
           
-          {(user.role === 'lawyer' || user.role === 'admin') && (
+          {(user.role === 'LAWYER' || user.role === 'ADMIN') && (
             <div className="pt-4">
               <button onClick={() => setDeleteOpen(true)} className="flex items-center gap-2 text-xs font-semibold text-maroon hover:text-maroon-dark transition-colors">
                 <Trash2 size={14} /> Request Document Deletion

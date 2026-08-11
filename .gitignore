@@ -1,0 +1,54 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# Build artifacts and directories
+dist/
+build/
+.next/
+out/
+.nuxt/
+.output/
+.cache/
+coverage/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Docker/Local Storage
+uploads/
+storage_vault/
+postgres_data/
+
+# Fabric
+fabric/test-network/organizations/
+fabric/test-network/channel-artifacts/
+fabric/test-network/log.txt
+fabric/test-network/*.tar.gz
+fabric/test-network/docker/docker-compose-*.yaml
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Temporary files
+tmp/
+temp/

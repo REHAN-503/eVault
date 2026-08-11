@@ -27,7 +27,10 @@ async function findByDocId(docId) {
 async function findByOwner(ownerId, { page, limit, search }) {
   const skip = (page - 1) * limit;
   const where = {
-    ownerId,
+    OR: [
+      { ownerId },
+      { sharedWith: { some: { id: ownerId } } }
+    ],
     isDeleted: false,
     ...(search
       ? { filename: { contains: search, mode: 'insensitive' } }

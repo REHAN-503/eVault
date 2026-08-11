@@ -25,8 +25,9 @@ const CONFIG = {
   CHAINCODE_NAME: process.env.FABRIC_CHAINCODE_NAME ?? 'evaultcc',
   CRYPTO_PATH:
     process.env.FABRIC_CRYPTO_PATH ??
-    path.join(
-      process.env.EVAULT_ROOT ?? path.join(process.env.HOME ?? '.', 'eVault'),
+    path.resolve(
+      __dirname,
+      '../../',
       'fabric',
       'test-network',
       'organizations',

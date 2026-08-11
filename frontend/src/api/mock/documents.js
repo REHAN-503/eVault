@@ -22,7 +22,7 @@ export async function getDocument(docId) {
   const doc = getDocuments().find((d) => d.docId === docId);
   const user = await getCurrentUser();
 
-  if (doc && user?.role === 'client') {
+  if (doc && user?.role === 'CLIENT') {
     const sharedWithMe = (doc.sharedWith || []).includes(user.id);
     if (!sharedWithMe) {
       throw new Error('Access Denied. You do not have permission to view this legal record.');

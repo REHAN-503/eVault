@@ -19,7 +19,7 @@ export async function login({ email, password }) {
 
 export async function register({ email, password, fullName, role }) {
   const { data } = await client.post('/auth/register', { email, password, fullName, role });
-  return data;
+  return data.data;
 }
 
 export async function getCurrentUser() {
@@ -49,4 +49,14 @@ export async function logout() {
   localStorage.removeItem('evault_token');
   localStorage.removeItem('evault_refresh_token');
   localStorage.removeItem('evault_user');
+}
+
+export async function listUsers() {
+  const { data } = await client.get('/admin/users');
+  return data.data;
+}
+
+export async function updateUserStatus(userId, status) {
+  const { data } = await client.patch(`/admin/users/${userId}/status`, { status });
+  return data.data;
 }

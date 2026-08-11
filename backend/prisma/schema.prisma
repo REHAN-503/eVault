@@ -17,7 +17,8 @@ model User {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
   auditLogs    AuditLog[]
-  documents    DocumentMetadata[]
+  documents    DocumentMetadata[] @relation("DocumentOwner")
+  sharedDocs   DocumentMetadata[] @relation("SharedDocuments")
   sessions     Session[]
 
   @@map("users")
@@ -43,6 +44,8 @@ model DocumentMetadata {
   cid         String
   currentHash String
   ownerId     String
+  title       String?
+  caseNo      String?
   version     Int        @default(1)
   filename    String
   mimetype    String
@@ -51,7 +54,8 @@ model DocumentMetadata {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   auditLogs   AuditLog[]
-  owner       User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner       User       @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  sharedWith  User[]     @relation("SharedDocuments")
 
   @@index([ownerId])
   @@index([docId])

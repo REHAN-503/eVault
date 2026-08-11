@@ -50,7 +50,7 @@ export async function register({ fullName, email, phone, password, role, status 
     name: fullName,
     email: safeEmail,
     role: role || 'client',
-    org: role === 'client' ? 'Individual' : 'Registry Member',
+    org: role === 'CLIENT' ? 'Individual' : 'Registry Member',
     status: status || 'pending', // Default to pending for public registration
     phone: phone || '',
     createdAt: new Date().toISOString()

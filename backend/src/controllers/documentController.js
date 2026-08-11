@@ -4,10 +4,28 @@ const documentService = require('../services/document/document.service');
 const { success } = require('../utils/response');
 const { HTTP_STATUS } = require('../constants');
 
+function mapDocumentForFrontend(doc) {
+  return {
+    docId: doc.docId,
+    title: doc.title || doc.filename,
+    caseNo: doc.caseNo || 'N/A',
+    ownerId: doc.ownerId,
+    ownerName: doc.owner?.fullName || 'Unknown',
+    hash: doc.currentHash,
+    cid: doc.cid,
+    status: 'verified', // If it's in the DB, it's considered verified unless flagged
+    size: `${(doc.sizeBytes / (1024 * 1024)).toFixed(1)} MB`,
+    version: doc.version,
+    updatedAt: doc.updatedAt,
+    sharedWith: doc.sharedWith ? doc.sharedWith.map(u => u.id) : [],
+  };
+}
+
 async function upload(req, res, next) {
   try {
-    const document = await documentService.uploadDocument(req.file, req.user.id, req.user.role);
-    return success(res, 'Document uploaded successfully', document, HTTP_STATUS.CREATED);
+    const { title, caseNo } = req.body;
+    const document = await documentService.uploadDocument(req.file, req.user.id, req.user.role, title, caseNo);
+    return success(res, 'Document uploaded successfully', mapDocumentForFrontend(document), HTTP_STATUS.CREATED);
   } catch (err) {
     next(err);
   }
@@ -25,7 +43,7 @@ async function list(req, res, next) {
     const limit = parseInt(req.query.limit, 10) || 20;
 
     return success(res, 'Documents retrieved successfully', {
-      documents,
+      documents: documents.map(mapDocumentForFrontend),
       pagination: {
         page,
         limit,
@@ -45,7 +63,7 @@ async function getById(req, res, next) {
       req.user.id,
       req.user.role
     );
-    return success(res, 'Document retrieved successfully', document);
+    return success(res, 'Document retrieved successfully', mapDocumentForFrontend(document));
   } catch (err) {
     next(err);
   }
@@ -79,7 +97,7 @@ async function update(req, res, next) {
       req.user.id,
       req.user.role
     );
-    return success(res, 'Document updated successfully', document);
+    return success(res, 'Document updated successfully', mapDocumentForFrontend(document));
   } catch (err) {
     next(err);
   }

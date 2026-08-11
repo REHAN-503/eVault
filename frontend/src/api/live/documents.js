@@ -5,17 +5,17 @@ const DEMO_ENCRYPTION_KEY = 'sih1284-demo-encryption-key';
 
 export async function listDocuments(page = 1, limit = 20, search = '') {
   const { data } = await client.get('/documents', { params: { page, limit, search } });
-  return data.data; 
+  return data.data.documents || []; 
 }
 
 export async function getDocument(docId) {
   const { data } = await client.get(`/documents/${docId}`);
-  return data;
+  return data.data;
 }
 
 export async function getVersionHistory(docId) {
   const { data } = await client.get(`/documents/${docId}/history`);
-  return data;
+  return data.data;
 }
 
 export async function downloadDocument(docId) {
@@ -60,7 +60,7 @@ export async function uploadDocument({ title, caseNo, file }, onStep) {
   });
   
   onStep?.(6, steps[6]);
-  return data;
+  return data.data;
 }
 
 export async function checkAccess(docId, userId) {
@@ -74,17 +74,17 @@ export async function checkAccess(docId, userId) {
 
 export async function grantAccess(docId, userId, permission = 'READ') {
   const { data } = await client.post(`/documents/${docId}/share`, { userId, permission });
-  return data;
+  return data.data;
 }
 
 export async function revokeAccess(docId, userId) {
   const { data } = await client.post(`/documents/${docId}/revoke`, { userId });
-  return data;
+  return data.data;
 }
 
 export async function getDocumentAudit(docId) {
   const { data } = await client.get(`/documents/${docId}/audit`);
-  return data;
+  return data.data;
 }
 
 export async function updateDocument(docId, { file }, onStep) {
@@ -112,10 +112,10 @@ export async function updateDocument(docId, { file }, onStep) {
     },
   });
   
-  return data;
+  return data.data;
 }
 
 export async function deleteDocument(docId) {
   const { data } = await client.delete(`/documents/${docId}`);
-  return data;
+  return data.data;
 }

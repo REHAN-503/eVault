@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   // Form state for adding an institutional member
-  const [form, setForm] = useState({ fullName: '', email: '', password: '', role: 'lawyer', status: 'active' });
+  const [form, setForm] = useState({ fullName: '', email: '', password: '', role: 'LAWYER', status: 'APPROVED' });
   const [busy, setBusy] = useState(false);
 
   async function refresh() {
@@ -36,8 +36,11 @@ export default function AdminDashboard() {
     setBusy(true);
     try {
       // Direct provision as active institutional member
-      await register(form);
-      setForm({ fullName: '', email: '', password: '', role: 'lawyer', status: 'active' });
+      const newUser = await register(form);
+      // Immediately approve since the admin is creating them
+      await updateUserStatus(newUser.id, 'APPROVED');
+      
+      setForm({ fullName: '', email: '', password: '', role: 'LAWYER', status: 'APPROVED' });
       toast.success('Institutional Member provisioned successfully.');
       refresh();
     } catch (err) {
@@ -56,8 +59,8 @@ export default function AdminDashboard() {
     }
   }
 
-  const pendingUsers = users.filter(u => u.status === 'PENDING');
-  const activeUsers = users.filter(u => u.status === 'APPROVED' && u.role !== 'ADMIN');
+  const pendingUsers = users.filter(u => String(u.status).toUpperCase() === 'PENDING');
+  const activeUsers = users.filter(u => String(u.status).toUpperCase() === 'APPROVED' && String(u.role).toUpperCase() !== 'ADMIN');
 
   return (
     <PortalShell role="admin" user={user}>
@@ -213,10 +216,11 @@ export default function AdminDashboard() {
                 <div>
                   <label className="block text-[10px] uppercase font-bold text-slate mb-1">Network Role</label>
                   <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    className="w-full text-sm border border-line rounded px-3 py-2 bg-[#FAFAFA] focus:bg-white focus:border-ink outline-none transition-colors">
-                    <option value="lawyer">Legal Counsel</option>
-                    <option value="judge">Hon. Court</option>
-                    <option value="admin">Registry Admin</option>
+                    className="w-full bg-white text-slate px-4 py-2 rounded border border-light focus:outline-none focus:border-ink transition-colors"
+                  >
+                    <option value="LAWYER">Lawyer</option>
+                    <option value="JUDGE">Judge</option>
+                    <option value="ADMIN">Admin</option>
                   </select>
                 </div>
                 <div>

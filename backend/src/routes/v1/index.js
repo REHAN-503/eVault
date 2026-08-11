@@ -16,6 +16,6 @@ router.use('/auth', authRoutes);
 router.use('/documents', documentRoutes);
 router.use('/integration', integrationRoutes);
 router.use('/system', systemRoutes);
-router.use('/', adminRoutes);
+router.use('/admin', adminRoutes);
 
 module.exports = router;

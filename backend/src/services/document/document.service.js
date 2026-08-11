@@ -24,7 +24,7 @@ function createError(message, statusCode, errorCode, details = '') {
  * Upload a document.
  * Flow: receive encrypted buffer → store via storage service → record on blockchain → save metadata
  */
-async function uploadDocument(file, userId, role) {
+async function uploadDocument(file, userId, role, title, caseNo) {
   if (!file) {
     throw createError('No file provided', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
   }
@@ -51,6 +51,8 @@ async function uploadDocument(file, userId, role) {
     cid,
     currentHash: fileHash,
     ownerId: userId,
+    title,
+    caseNo,
     filename: file.originalname,
     mimetype: file.mimetype,
     sizeBytes: file.size,
@@ -80,8 +82,8 @@ async function listDocuments(userId, role, query) {
 /**
  * Get a single document by ID, with access check.
  */
-async function getDocument(documentId, userId, role) {
-  const document = await documentRepository.findById(documentId);
+async function getDocument(databaseId, userId, role) {
+  const document = await documentRepository.findById(databaseId);
   if (!document || document.isDeleted) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
@@ -111,8 +113,8 @@ async function getDocument(documentId, userId, role) {
 /**
  * Download a document's file content.
  */
-async function downloadDocument(documentId, userId, role) {
-  const document = await getDocument(documentId, userId, role);
+async function downloadDocument(databaseId, userId, role) {
+  const document = await getDocument(databaseId, userId, role);
 
   // Retrieve file from storage
   const buffer = await storageService.download(document.cid);
@@ -128,8 +130,8 @@ async function downloadDocument(documentId, userId, role) {
  * Update a document (new version upload).
  * Increments version, previous hash stays in blockchain history.
  */
-async function updateDocument(documentId, file, userId, role) {
-  const document = await documentRepository.findById(documentId);
+async function updateDocument(databaseId, file, userId, role) {
+  const document = await documentRepository.findById(databaseId);
   if (!document || document.isDeleted) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
@@ -164,7 +166,7 @@ async function updateDocument(documentId, file, userId, role) {
   });
 
   // Update metadata in Postgres
-  const updated = await documentRepository.update(documentId, {
+  const updated = await documentRepository.update(databaseId, {
     cid: newCid,
     currentHash: newHash,
     filename: file.originalname,
@@ -187,8 +189,8 @@ async function updateDocument(documentId, file, userId, role) {
  * Soft-delete a document.
  * Legal records should not be hard-deleted.
  */
-async function deleteDocument(documentId, userId, role) {
-  const document = await documentRepository.findById(documentId);
+async function deleteDocument(databaseId, userId, role) {
+  const document = await documentRepository.findById(databaseId);
   if (!document || document.isDeleted) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
@@ -202,16 +204,16 @@ async function deleteDocument(documentId, userId, role) {
     );
   }
 
-  await documentRepository.softDelete(documentId);
+  await documentRepository.softDelete(databaseId);
 
-  return { id: documentId, message: 'Document soft-deleted successfully' };
+  return { id: databaseId, message: 'Document soft-deleted successfully' };
 }
 
 /**
  * Share a document — grant access to another user.
  */
-async function shareDocument(documentId, targetUserId, permission, userId, role) {
-  const document = await documentRepository.findById(documentId);
+async function shareDocument(databaseId, targetUserId, permission, userId, role) {
+  const document = await documentRepository.findById(databaseId);
   if (!document || document.isDeleted) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
@@ -227,6 +229,11 @@ async function shareDocument(documentId, targetUserId, permission, userId, role)
 
   const result = await blockchainService.grantAccess(document.docId, targetUserId, permission);
 
+  // Sync access to Postgres for efficient querying (Bug 5)
+  await documentRepository.update(databaseId, {
+    sharedWith: { connect: { id: targetUserId } }
+  });
+
   // Audit log
   await auditService.logAction(document.id, userId, AuditAction.SHARE, {
     txId: result.txId,
@@ -240,8 +247,8 @@ async function shareDocument(documentId, targetUserId, permission, userId, role)
 /**
  * Revoke a user's access to a document.
  */
-async function revokeDocument(documentId, targetUserId, userId, role) {
-  const document = await documentRepository.findById(documentId);
+async function revokeDocument(databaseId, targetUserId, userId, role) {
+  const document = await documentRepository.findById(databaseId);
   if (!document || document.isDeleted) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
@@ -257,6 +264,11 @@ async function revokeDocument(documentId, targetUserId, userId, role) {
 
   const result = await blockchainService.revokeAccess(document.docId, targetUserId);
 
+  // Sync access to Postgres for efficient querying (Bug 5)
+  await documentRepository.update(databaseId, {
+    sharedWith: { disconnect: { id: targetUserId } }
+  });
+
   // Audit log
   await auditService.logAction(document.id, userId, AuditAction.REVOKE, {
     txId: result.txId,
@@ -269,8 +281,8 @@ async function revokeDocument(documentId, targetUserId, userId, role) {
 /**
  * Get document version history from blockchain.
  */
-async function getDocumentHistory(documentId, userId, role) {
-  const document = await documentRepository.findById(documentId);
+async function getDocumentHistory(databaseId, userId, role) {
+  const document = await documentRepository.findById(databaseId);
   if (!document || document.isDeleted) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
@@ -296,8 +308,8 @@ async function getDocumentHistory(documentId, userId, role) {
 /**
  * Get document audit trail.
  */
-async function getDocumentAudit(documentId, userId, role) {
-  const document = await documentRepository.findById(documentId);
+async function getDocumentAudit(databaseId, userId, role) {
+  const document = await documentRepository.findById(databaseId);
   if (!document || document.isDeleted) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
@@ -317,7 +329,7 @@ async function getDocumentAudit(documentId, userId, role) {
     }
   }
 
-  return auditService.getAudit(documentId);
+  return auditService.getAudit(databaseId);
 }
 
 module.exports = {

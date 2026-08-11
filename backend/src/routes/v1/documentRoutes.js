@@ -30,7 +30,8 @@ const upload = multer({
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'image/jpeg',
-      'image/png'
+      'image/png',
+      'application/octet-stream' // Required for client-side encrypted blobs
     ];
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);

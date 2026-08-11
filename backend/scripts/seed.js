@@ -27,42 +27,46 @@ async function main() {
   const users = await Promise.all([
     prisma.user.upsert({
       where: { email: 'admin@evault.in' },
-      update: {},
+      update: { status: 'APPROVED' },
       create: {
         email: 'admin@evault.in',
         passwordHash,
         role: 'ADMIN',
         fullName: 'Admin User',
+        status: 'APPROVED',
       },
     }),
     prisma.user.upsert({
       where: { email: 'lawyer@evault.in' },
-      update: {},
+      update: { status: 'APPROVED' },
       create: {
         email: 'lawyer@evault.in',
         passwordHash,
         role: 'LAWYER',
         fullName: 'Adv. Priya Sharma',
+        status: 'APPROVED',
       },
     }),
     prisma.user.upsert({
       where: { email: 'judge@evault.in' },
-      update: {},
+      update: { status: 'APPROVED' },
       create: {
         email: 'judge@evault.in',
         passwordHash,
         role: 'JUDGE',
         fullName: 'Hon. Justice Rajesh Kumar',
+        status: 'APPROVED',
       },
     }),
     prisma.user.upsert({
       where: { email: 'client@evault.in' },
-      update: {},
+      update: { status: 'APPROVED' },
       create: {
         email: 'client@evault.in',
         passwordHash,
         role: 'CLIENT',
         fullName: 'Amit Patel',
+        status: 'APPROVED',
       },
     }),
   ]);

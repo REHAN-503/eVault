@@ -1,82 +1,72 @@
 # eVault
 
-Blockchain-backed legal records registry built with React/Vite, Node.js, PostgreSQL, Hyperledger Fabric and Docker.
+A secure, presentation-ready, production-grade document management and vault system powered by Hyperledger Fabric, React, Express, and PostgreSQL.
 
-## Requirements
+## Architecture
 
-- Windows 10/11
-- WSL2 with Ubuntu
-- Docker Desktop
-- Docker Desktop WSL2 integration enabled
+* **Frontend:** React + Vite, TailwindCSS
+* **Backend API Gateway:** Node.js, Express, Prisma ORM
+* **Database:** PostgreSQL (Metadata \u0026 Audit indexing)
+* **Blockchain:** Hyperledger Fabric (Immutable Document Registry \u0026 Access Control)
+* **Storage:** Extensible Storage Provider (Local volume used by default)
 
-## Quick Start
+## Getting Started
 
-From WSL:
+### Prerequisites
 
-    cd ~/eVault
-    docker compose up -d --build
+* Docker \u0026 Docker Compose
+* Node.js (v18+)
 
-Check containers:
+### Running the Project
 
-    docker compose ps
+To start the full stack (Database, Fabric network, Backend API, Frontend):
 
-## Access
+```bash
+docker-compose up --build -d
+```
 
-Frontend: http://localhost:8080
+Once running:
+* **Frontend Application:** http://localhost:8080
+* **Backend API Gateway:** http://localhost:3000/api/v1
+* **API Documentation (Swagger):** http://localhost:3000/api-docs
 
-Backend: http://localhost:3000
+## Directory Structure
 
-Health: http://localhost:3000/health
+* `backend/` - The Express API Gateway and Prisma ORM configuration.
+* `chaincode/` - Hyperledger Fabric Smart Contracts (TypeScript).
+* `docker/` - Dockerfiles for deploying the application.
+* `fabric/` - Configuration for the Fabric test network.
+* `frontend/` - React application.
+* `gateway/` - A Node.js module wrapping `@hyperledger/fabric-gateway` for gRPC connectivity.
 
-API Docs: http://localhost:3000/api-docs
+## Environment Variables
 
-## Admin
+All secrets are managed in `.env` files. Ensure you copy `.env.example` to `.env` in the `backend/` directory before running migrations locally outside of Docker.
 
-Email: admin@evault.in
+## Testing
 
-Password: Admin@123456
+To build and test components individually:
 
-Admin panel: http://localhost:8080/admin
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run build
+```
 
-## Useful Commands
+**Gateway Wrapper:**
+```bash
+cd gateway
+npm install
+npm run build
+```
 
-Start:
-
-    docker compose up -d
-
-Rebuild:
-
-    docker compose up -d --build
-
-Stop:
-
-    docker compose down
-
-Logs:
-
-    docker compose logs -f
-
-Backend logs:
-
-    docker compose logs -f backend
-
-Frontend logs:
-
-    docker compose logs -f frontend
-
-## Project Structure
-
-    eVault/
-    ├── backend/
-    ├── frontend/
-    ├── chaincode/
-    ├── fabric/
-    ├── gateway/
-    ├── storage-security/
-    ├── docker/
-    ├── scripts/
-    └── docker-compose.yml
-
-## Security
-
-This project is intended for local testing/demo purposes. Change default passwords and secrets before production use.
+**Backend API:**
+```bash
+cd backend
+npm install
+npm run db:generate
+npm run db:migrate # (Requires evault-postgres to be running)
+npm test
+```
+*Note: Backend tests require Jest configuration for ES Module transformations (`@noble/curves`).*

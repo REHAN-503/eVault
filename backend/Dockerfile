@@ -10,17 +10,13 @@ RUN apk add --no-cache python3 make g++
 # =========================================================
 
 COPY gateway /gateway
-COPY storage-security /storage-security
-
 # =========================================================
 # Backend dependencies
 # =========================================================
 
 COPY backend/package.json backend/package-lock.json* ./
 
-RUN npm install --omit=dev --package-lock=false --ignore-scripts
-
-RUN npm rebuild bcrypt --build-from-source
+RUN npm install --omit=dev --package-lock=false
 
 # =========================================================
 # Prisma
