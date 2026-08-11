@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PortalShell from '../components/PortalShell';
-import { listDocuments, checkAccess } from '../api/documents';
+import { listDocuments, verifyLedger } from '../api/documents';
 import { FileText, ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, ChevronRight, Scale, Search, Shield, Fingerprint } from 'lucide-react';
 import { HashChip } from '../components/Atoms';
 import { toast } from 'sonner';
@@ -24,9 +24,9 @@ export default function JudgeDashboard() {
   async function handleVerify(docId) {
     setVerifying(docId);
     try {
-      const res = await checkAccess(docId, user.id);
-      setVerifiedIds((prev) => ({ ...prev, [docId]: res.allowed }));
-      if (res.allowed) {
+      const res = await verifyLedger(docId);
+      setVerifiedIds((prev) => ({ ...prev, [docId]: res.match }));
+      if (res.match) {
         toast.success(`Ledger matched for ${docId}`);
       } else {
         toast.error(`Cryptographic mismatch detected for ${docId}`);

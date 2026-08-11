@@ -44,6 +44,19 @@ beforeAll(async () => {
 
   accessToken = loginRes.body.data.accessToken;
   userId = loginRes.body.data.user.id;
+
+  const judgeEmail = `judge_${Date.now()}@evault.test`;
+  await request(app).post('/api/v1/auth/register').send({
+    email: judgeEmail,
+    password: 'TestPass123',
+    fullName: 'Document Test Judge',
+    role: 'JUDGE',
+  });
+  const loginResJudge = await request(app).post('/api/v1/auth/login').send({
+    email: judgeEmail,
+    password: 'TestPass123',
+  });
+  global.judgeAccessToken = loginResJudge.body.data.accessToken;
 });
 
 afterAll(async () => {
@@ -184,6 +197,52 @@ describe('Document Flow', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
       expect(Array.isArray(res.body.data)).toBe(true);
+    });
+  });
+
+  describe('GET /api/v1/documents/:id/verify', () => {
+    it('should verify document successfully when hashes match', async () => {
+      const res = await request(app)
+        .get(`/api/v1/documents/${documentId}/verify`)
+        .set('Authorization', `Bearer ${global.judgeAccessToken}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.verified).toBe(true);
+      expect(res.body.data.match).toBe(true);
+    });
+
+    it('should return verification failure when hashes mismatch', async () => {
+      // Artificially alter the database hash
+      const doc = await prisma.documentMetadata.findUnique({ where: { id: documentId } });
+      await prisma.documentMetadata.update({
+        where: { id: documentId },
+        data: { currentHash: 'altered_hash_for_testing' }
+      });
+
+      const res = await request(app)
+        .get(`/api/v1/documents/${documentId}/verify`)
+        .set('Authorization', `Bearer ${global.judgeAccessToken}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.verified).toBe(false);
+      expect(res.body.data.match).toBe(false);
+
+      // Restore hash
+      await prisma.documentMetadata.update({
+        where: { id: documentId },
+        data: { currentHash: doc.currentHash }
+      });
+    });
+
+    it('should return 404 for missing ledger record', async () => {
+      const fakeId = '00000000-0000-0000-0000-000000000000';
+      const res = await request(app)
+        .get(`/api/v1/documents/${fakeId}/verify`)
+        .set('Authorization', `Bearer ${global.judgeAccessToken}`);
+
+      expect(res.statusCode).toBe(404);
     });
   });
 

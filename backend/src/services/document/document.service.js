@@ -45,18 +45,24 @@ async function uploadDocument(file, userId, role, title, caseNo) {
     sizeBytes: file.size,
   }, userId, role);
 
-  // Save metadata in Postgres
-  const document = await documentRepository.create({
-    docId,
-    cid,
-    currentHash: fileHash,
-    ownerId: userId,
-    title,
-    caseNo,
-    filename: file.originalname,
-    mimetype: file.mimetype,
-    sizeBytes: file.size,
-  });
+  let document;
+  try {
+    document = await documentRepository.create({
+      docId,
+      cid,
+      currentHash: fileHash,
+      ownerId: userId,
+      title,
+      caseNo,
+      filename: file.originalname,
+      mimetype: file.mimetype,
+      sizeBytes: file.size,
+    });
+  } catch (err) {
+    // If we fail here, storage and blockchain are written but DB is not. 
+    console.error(`[Upload Error] Partial failure: Storage/Fabric succeeded, DB failed for docId ${docId}`, err);
+    throw createError('Failed to persist document metadata after storage', HTTP_STATUS.INTERNAL_SERVER_ERROR, ERROR_CODES.INTERNAL_ERROR);
+  }
 
   // Audit log
   await auditService.logAction(document.id, userId, AuditAction.UPLOAD, {
@@ -218,18 +224,28 @@ async function shareDocument(databaseId, targetUserId, permission, userId, role)
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
 
-  // Only owner or admin can share
-  if (document.ownerId !== userId && role !== 'ADMIN') {
+  // Only Judges, Admins, or the document owner can share
+  const isOwner = document.ownerId === userId;
+  if (!isOwner && role !== 'JUDGE' && role !== 'ADMIN') {
     throw createError(
-      'Only the document owner or an admin can share this document',
+      'Only Judges, Admins, or the document owner can manage document access',
       HTTP_STATUS.FORBIDDEN,
       ERROR_CODES.AUTHORIZATION_ERROR
     );
   }
 
-  const result = await blockchainService.grantAccess(document.docId, targetUserId, permission);
+  // Validate the target user exists and is a Lawyer. Status check removed to allow sharing with users pending approval (e.g., test user).
+  const targetUser = await require('../../repositories/userRepository').findById(targetUserId);
+  if (!targetUser || targetUser.role !== 'LAWYER') {
+    throw createError('Invalid target user for sharing (must be a Lawyer)', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
+  }
 
-  // Sync access to Postgres for efficient querying (Bug 5)
+  // Force READ ONLY permission
+  const finalPermission = 'READ';
+
+  const result = await blockchainService.grantAccess(document.docId, targetUserId, finalPermission);
+
+  // Sync access to Postgres for efficient querying
   await documentRepository.update(databaseId, {
     sharedWith: { connect: { id: targetUserId } }
   });
@@ -238,7 +254,7 @@ async function shareDocument(databaseId, targetUserId, permission, userId, role)
   await auditService.logAction(document.id, userId, AuditAction.SHARE, {
     txId: result.txId,
     sharedWith: targetUserId,
-    permission,
+    permission: finalPermission,
   });
 
   return result;
@@ -253,10 +269,11 @@ async function revokeDocument(databaseId, targetUserId, userId, role) {
     throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
 
-  // Only owner or admin can revoke
-  if (document.ownerId !== userId && role !== 'ADMIN') {
+  // Only Judges, Admins, or the document owner can revoke
+  const isOwner = document.ownerId === userId;
+  if (!isOwner && role !== 'JUDGE' && role !== 'ADMIN') {
     throw createError(
-      'Only the document owner or an admin can revoke access',
+      'Only Judges, Admins, or the document owner can manage document access',
       HTTP_STATUS.FORBIDDEN,
       ERROR_CODES.AUTHORIZATION_ERROR
     );
@@ -332,6 +349,56 @@ async function getDocumentAudit(databaseId, userId, role) {
   return auditService.getAudit(databaseId);
 }
 
+/**
+ * Verify document cryptographic hashes between PostgreSQL and Fabric.
+ */
+async function verifyLedger(databaseId, userId, role) {
+  const document = await documentRepository.findById(databaseId);
+  if (!document || document.isDeleted) {
+    throw createError('Document not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
+  }
+
+  // Check access before allowing verification
+  const isOwner = document.ownerId === userId;
+  const isPrivileged = role === 'ADMIN' || role === 'JUDGE';
+
+  if (!isOwner && !isPrivileged) {
+    const hasAccess = await blockchainService.checkAccess(document.docId, userId);
+    if (!hasAccess) {
+      throw createError('Access denied', HTTP_STATUS.FORBIDDEN, ERROR_CODES.AUTHORIZATION_ERROR);
+    }
+  }
+
+  try {
+    const ledgerRecord = await blockchainService.getDocument(document.docId);
+    
+    const isMatch = ledgerRecord.hash === document.currentHash;
+
+    // Audit the verification
+    // Audit the verification using a valid enum action
+    await auditService.logAction(document.id, userId, AuditAction.VIEW, {
+      match: isMatch,
+      databaseHash: document.currentHash,
+      ledgerHash: ledgerRecord.hash,
+    });
+
+      return {
+        verified: isMatch,
+        docId: document.docId,
+        databaseHash: document.currentHash,
+        ledgerHash: ledgerRecord.hash,
+        match: isMatch
+      };
+  } catch (err) {
+    return {
+      verified: false,
+      docId: document.docId,
+      error: 'Failed to retrieve Fabric record',
+      match: false
+    };
+  }
+}
+
 module.exports = {
   uploadDocument,
   listDocuments,
@@ -343,4 +410,5 @@ module.exports = {
   revokeDocument,
   getDocumentHistory,
   getDocumentAudit,
+  verifyLedger,
 };

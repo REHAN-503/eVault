@@ -21,7 +21,8 @@ const uploadData = [
 export default function LawyerDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [docs, setDocs] = useState([]);
+  const [myDocs, setMyDocs] = useState([]);
+  const [sharedDocs, setSharedDocs] = useState([]);
   const [recentAudit, setRecentAudit] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -29,11 +30,13 @@ export default function LawyerDashboard() {
   async function refresh() {
     setLoading(true);
     const data = await listDocuments();
-    const myDocs = data.filter((d) => d.ownerId === user?.id);
-    setDocs(myDocs);
+    const own = data.filter((d) => d.ownerId === user?.id);
+    const shared = data.filter((d) => d.ownerId !== user?.id);
+    setMyDocs(own);
+    setSharedDocs(shared);
 
-    if (myDocs.length > 0) {
-      const audits = await getDocumentAudit(myDocs[0].docId);
+    if (own.length > 0) {
+      const audits = await getDocumentAudit(own[0].docId);
       setRecentAudit(audits.slice(0, 5));
     } else {
       setRecentAudit([]);
@@ -44,7 +47,8 @@ export default function LawyerDashboard() {
 
   useEffect(() => { refresh(); }, []);
 
-  const verified = docs.filter((d) => d.status === 'verified').length;
+  const verified = myDocs.filter((d) => d.status === 'verified').length + sharedDocs.filter((d) => d.status === 'verified').length;
+  const total = myDocs.length + sharedDocs.length;
 
   return (
     <PortalShell role="lawyer" user={user}>
@@ -65,12 +69,12 @@ export default function LawyerDashboard() {
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1 flex flex-col gap-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <StatCard label="Total Filings" value={loading ? '—' : docs.length} icon={FileText} />
+            <StatCard label="Total Filings" value={loading ? '—' : total} icon={FileText} />
             <StatCard label="Verified on Ledger" value={loading ? '—' : verified} accent="verified" icon={ShieldCheck} />
             <StatCard label="Storage Usage" value={loading ? '—' : '1.2 GB'} sub="33% of quota" icon={Activity} />
           </div>
 
-          <Card title="Document Workspace">
+          <Card title="My Documents">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-white border-b border-line text-[10px] uppercase tracking-widest text-slate font-bold">
@@ -86,7 +90,7 @@ export default function LawyerDashboard() {
                 <tbody className="divide-y divide-line">
                   {loading && <LoadingSkeleton rows={4} cols={6} />}
 
-                  {!loading && docs.map((d) => (
+                  {!loading && myDocs.map((d) => (
                     <tr
                       key={d.docId}
                       className="hover:bg-paper-dim/50 transition-colors group cursor-pointer"
@@ -123,7 +127,7 @@ export default function LawyerDashboard() {
                     </tr>
                   ))}
 
-                  {docs.length === 0 && !loading && (
+                  {myDocs.length === 0 && !loading && (
                     <tr>
                       <td colSpan={6}>
                         <EmptyState
@@ -139,6 +143,74 @@ export default function LawyerDashboard() {
                               Upload Document
                             </button>
                           }
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <Card title="Shared With Me">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-white border-b border-line text-[10px] uppercase tracking-widest text-slate font-bold">
+                  <tr>
+                    <th className="px-6 py-4">Title & Proof</th>
+                    <th className="px-6 py-4">Case Ref</th>
+                    <th className="px-6 py-4">Ver.</th>
+                    <th className="px-6 py-4">Ledger Status</th>
+                    <th className="px-6 py-4">Updated</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {loading && <LoadingSkeleton rows={2} cols={6} />}
+
+                  {!loading && sharedDocs.map((d) => (
+                    <tr
+                      key={d.docId}
+                      className="hover:bg-paper-dim/50 transition-colors group cursor-pointer"
+                      onClick={() => navigate(`/documents/${d.docId}`)}
+                    >
+                      <td className="px-6 py-5">
+                        <div className="flex items-start gap-3">
+                          <ProofSeal status={d.status} size={32} showLabel={false} />
+                          <div>
+                            <span className="font-semibold text-ink block mb-1">{d.title}</span>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="flex items-center gap-1 text-[10px] font-mono text-slate bg-slate/5 px-2 py-0.5 rounded border border-slate/10">
+                                <Hash size={10} /> {d.docId}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 font-mono text-xs text-slate">{d.caseNo}</td>
+                      <td className="px-6 py-5 text-xs text-slate font-bold">v{d.version}</td>
+                      <td className="px-6 py-5"><StatusPill status={d.status} /></td>
+                      <td className="px-6 py-5 text-xs text-slate font-medium">{new Date(d.updatedAt).toLocaleDateString()}</td>
+                      <td className="px-6 py-5 text-right">
+                        <Link
+                          to={`/documents/${d.docId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-line text-slate hover:bg-white hover:text-ink hover:border-slate/30 transition-all shadow-sm"
+                          aria-label={`Open ${d.docId}`}
+                        >
+                          <ArrowUpRight size={16} />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {sharedDocs.length === 0 && !loading && (
+                    <tr>
+                      <td colSpan={6}>
+                        <EmptyState
+                          icon={ShieldCheck}
+                          title="No Shared Documents"
+                          description="Documents shared with you by judges will appear here."
                         />
                       </td>
                     </tr>

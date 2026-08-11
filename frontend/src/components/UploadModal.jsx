@@ -203,7 +203,7 @@ export default function UploadModal({ open, onClose, onUploaded }) {
                     </div>
                     {result.cid && (
                       <div className="border-b border-line pb-3">
-                        <span className="text-[10px] uppercase font-bold tracking-widest text-slate block mb-1">IPFS CID</span>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-slate block mb-1">Storage Reference</span>
                         <HashChip value={result.cid} chars={24} />
                       </div>
                     )}

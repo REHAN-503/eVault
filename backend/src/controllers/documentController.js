@@ -6,8 +6,10 @@ const { HTTP_STATUS } = require('../constants');
 
 function mapDocumentForFrontend(doc) {
   return {
+    id: doc.id,
     docId: doc.docId,
     title: doc.title || doc.filename,
+    filename: doc.filename,
     caseNo: doc.caseNo || 'N/A',
     ownerId: doc.ownerId,
     ownerName: doc.owner?.fullName || 'Unknown',
@@ -171,6 +173,19 @@ async function audit(req, res, next) {
   }
 }
 
+async function verifyLedger(req, res, next) {
+  try {
+    const result = await documentService.verifyLedger(
+      req.params.id,
+      req.user.id,
+      req.user.role
+    );
+    return success(res, 'Ledger verification complete', result);
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   upload,
   list,
@@ -182,4 +197,5 @@ module.exports = {
   revoke,
   history,
   audit,
+  verifyLedger,
 };

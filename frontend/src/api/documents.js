@@ -15,3 +15,4 @@ export const checkAccess = docs.checkAccess;
 export const grantAccess = docs.grantAccess;
 export const revokeAccess = docs.revokeAccess;
 export const getDocumentAudit = docs.getDocumentAudit;
+export const verifyLedger = docs.verifyLedger;

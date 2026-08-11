@@ -109,8 +109,8 @@ export function ProofSeal({ status = 'verified', size = 40, showLabel = true }) 
 export const UPLOAD_PIPELINE_STEPS = [
   'Encrypting file (AES-256, client-side)',
   'Authenticating request at API Gateway',
-  'Pushing encrypted object to IPFS',
-  'Content hash (CID) returned',
+  'Pushing encrypted object to secure storage',
+  'Storage reference returned',
   'Calling DocumentRegistryContract.recordDocument()',
   'Writing hash + metadata to ledger',
   'DocumentAdded event confirmed',

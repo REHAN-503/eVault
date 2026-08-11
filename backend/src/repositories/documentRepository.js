@@ -43,7 +43,10 @@ async function findByOwner(ownerId, { page, limit, search }) {
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
-      include: { owner: { select: { id: true, email: true, fullName: true, role: true } } },
+      include: { 
+        owner: { select: { id: true, email: true, fullName: true, role: true } },
+        sharedWith: { select: { id: true, role: true } }
+      },
     }),
     prisma.documentMetadata.count({ where }),
   ]);
@@ -66,7 +69,10 @@ async function findAll({ page, limit, search }) {
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
-      include: { owner: { select: { id: true, email: true, fullName: true, role: true } } },
+      include: { 
+        owner: { select: { id: true, email: true, fullName: true, role: true } },
+        sharedWith: { select: { id: true, role: true } }
+      },
     }),
     prisma.documentMetadata.count({ where }),
   ]);

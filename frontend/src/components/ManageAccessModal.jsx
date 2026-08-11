@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { grantAccess, revokeAccess } from '../api/documents';
+import client from '../api/client';
 import { UserPlus, UserMinus, X, Loader2 } from 'lucide-react';
 
 export default function ManageAccessModal({ open, onClose, docId, onUpdated }) {
   const [userId, setUserId] = useState('');
-  const [permission, setPermission] = useState('READ');
+  const [lawyers, setLawyers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      setUserId('');
+      setError('');
+      setSuccess('');
+      client.get('/users/lawyers').then((res) => {
+        setLawyers(res.data.data || []);
+      }).catch(err => {
+        console.error('Failed to load lawyers:', err);
+        setError('Failed to load approved lawyers');
+      });
+    }
+  }, [open]);
 
   async function handleGrant(e) {
     e.preventDefault();
@@ -17,8 +32,8 @@ export default function ManageAccessModal({ open, onClose, docId, onUpdated }) {
     setError('');
     setSuccess('');
     try {
-      await grantAccess(docId, userId, permission);
-      setSuccess(`Granted ${permission} access to ${userId}.`);
+      await grantAccess(docId, userId, 'READ');
+      setSuccess(`Granted READ access to the selected lawyer.`);
       setUserId('');
       onUpdated?.();
     } catch (err) {
@@ -75,24 +90,23 @@ export default function ManageAccessModal({ open, onClose, docId, onUpdated }) {
 
           <div className="p-6">
             <form onSubmit={handleGrant}>
-              <label className="block text-[10px] uppercase tracking-wider text-slate mb-1.5 font-bold">Participant ID</label>
-              <input
+              <label className="block text-[10px] uppercase tracking-wider text-slate mb-1.5 font-bold">Select Approved Lawyer</label>
+              <select
                 required
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="e.g. usr_105"
-                className="w-full rounded-md border border-line bg-paper-dim px-3.5 py-2.5 text-sm mb-4 focus:bg-white focus:border-seal focus:ring-2 focus:ring-seal/20 outline-none font-mono"
-              />
+                className="w-full rounded-md border border-line bg-paper-dim px-3.5 py-2.5 text-sm mb-4 focus:bg-white focus:border-seal focus:ring-2 focus:ring-seal/20 outline-none"
+              >
+                <option value="" disabled>Select a Lawyer...</option>
+                {lawyers.map(l => (
+                  <option key={l.id} value={l.id}>{l.fullName} ({l.email})</option>
+                ))}
+              </select>
 
               <label className="block text-[10px] uppercase tracking-wider text-slate mb-1.5 font-bold">Permission Level</label>
-              <select
-                value={permission}
-                onChange={(e) => setPermission(e.target.value)}
-                className="w-full rounded-md border border-line bg-paper-dim px-3.5 py-2.5 text-sm mb-6 focus:bg-white focus:border-seal focus:ring-2 focus:ring-seal/20 outline-none"
-              >
-                <option value="READ">View Only (Read)</option>
-                <option value="WRITE">Edit & Update (Write)</option>
-              </select>
+              <div className="w-full rounded-md border border-line bg-slate/10 px-3.5 py-2.5 text-sm mb-6 text-slate font-medium cursor-not-allowed">
+                View Only (Read)
+              </div>
 
               {error && <p className="text-xs text-maroon mb-4 bg-maroon/5 border border-maroon/20 rounded-md px-3 py-2">{error}</p>}
               {success && <p className="text-xs text-verified-dark mb-4 bg-verified-bg border border-verified/20 rounded-md px-3 py-2">{success}</p>}

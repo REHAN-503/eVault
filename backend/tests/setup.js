@@ -12,3 +12,5 @@ process.env.JWT_ACCESS_EXPIRY = '15m';
 process.env.JWT_REFRESH_EXPIRY = '7d';
 process.env.CORS_ORIGIN = 'http://localhost:5173';
 process.env.PORT = '0'; // Let OS pick a port
+process.env.RATE_LIMIT_MAX = '10000';
+process.env.AUTH_RATE_LIMIT_MAX = '10000';

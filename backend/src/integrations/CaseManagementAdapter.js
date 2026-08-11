@@ -1,7 +1,7 @@
 'use strict';
 
 const { v4: uuidv4 } = require('uuid');
-const logger = require('../../utils/logger');
+const logger = require('../utils/logger');
 
 /**
  * Integration Service — MOCK CIS Adapter

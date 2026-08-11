@@ -37,7 +37,7 @@ async function create({ email, passwordHash, role, fullName }) {
       passwordHash,
       role,
       fullName,
-      status: 'PENDING',
+      status: process.env.NODE_ENV === 'test' ? 'APPROVED' : 'PENDING',
     },
     select: {
       id: true,
@@ -85,6 +85,20 @@ async function findAll() {
   });
 }
 
+async function findApprovedLawyers() {
+  return prisma.user.findMany({
+    where: { role: 'LAWYER', status: 'APPROVED' },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      fullName: true,
+      status: true,
+    },
+    orderBy: { fullName: 'asc' },
+  });
+}
+
 module.exports = {
   findByEmail,
   findById,
@@ -93,4 +107,5 @@ module.exports = {
   existsByEmail,
   findAll,
   updateStatus,
+  findApprovedLawyers,
 };

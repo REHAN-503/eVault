@@ -16,4 +16,7 @@ module.exports = {
   // Fabric audit
   logAction: gateway.logAction,
   getAuditTrail: gateway.getAuditTrail,
+
+  // Test utils
+  resetMockState: gateway.resetMockState,
 };

@@ -77,7 +77,7 @@ router.use(authenticate);
  */
 router.post(
   '/upload',
-  requireRole(Role.LAWYER, Role.CLIENT, Role.ADMIN),
+  requireRole(Role.LAWYER, Role.ADMIN),
   upload.single('file'),
   documentController.upload
 );
@@ -207,7 +207,7 @@ router.get(
 router.put(
   '/:id',
   validateRequest(documentIdParamSchema, 'params'),
-  requireRole(Role.LAWYER, Role.CLIENT, Role.ADMIN),
+  requireRole(Role.LAWYER, Role.ADMIN),
   upload.single('file'),
   documentController.update
 );
@@ -234,7 +234,7 @@ router.put(
 router.delete(
   '/:id',
   validateRequest(documentIdParamSchema, 'params'),
-  requireRole(Role.LAWYER, Role.CLIENT, Role.ADMIN),
+  requireRole(Role.LAWYER, Role.ADMIN),
   documentController.remove
 );
 
@@ -276,7 +276,7 @@ router.post(
   '/:id/share',
   validateRequest(documentIdParamSchema, 'params'),
   validateRequest(shareDocumentSchema),
-  requireRole(Role.LAWYER, Role.CLIENT, Role.ADMIN),
+  requireRole(Role.LAWYER, Role.JUDGE, Role.ADMIN),
   documentController.share
 );
 
@@ -314,8 +314,33 @@ router.post(
   '/:id/revoke',
   validateRequest(documentIdParamSchema, 'params'),
   validateRequest(revokeDocumentSchema),
-  requireRole(Role.LAWYER, Role.CLIENT, Role.ADMIN),
+  requireRole(Role.LAWYER, Role.JUDGE, Role.ADMIN),
   documentController.revoke
+);
+
+/**
+ * @swagger
+ * /api/v1/documents/{id}/verify:
+ *   get:
+ *     summary: Verify document hash against blockchain ledger
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Verification result
+ */
+router.get(
+  '/:id/verify',
+  validateRequest(documentIdParamSchema, 'params'),
+  requireRole(Role.JUDGE, Role.ADMIN),
+  documentController.verifyLedger
 );
 
 /**

@@ -86,7 +86,10 @@
       "src/**/*.js",
       "!src/server.js",
       "!src/docs/**"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^evault-gateway/dist/index.js$": "<rootDir>/src/services/blockchain/blockchain.service.mock.js"
+    }
   },
   "allowScripts": {
     "bcrypt@5.1.1": true,

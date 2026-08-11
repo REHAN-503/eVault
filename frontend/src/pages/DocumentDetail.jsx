@@ -139,15 +139,15 @@ export default function DocumentDetail() {
             <button onClick={handleDownload} className="w-full flex items-center justify-center gap-2 rounded-md bg-ink text-white px-4 py-2.5 text-sm font-medium hover:bg-ink/90 transition-colors shadow-sm">
               <Download size={16} /> Download Decrypted
             </button>
-            {(user.role === 'LAWYER' || user.role === 'ADMIN') && (
-              <div className="flex gap-2">
-                <button onClick={() => setUpdateOpen(true)} className="flex-1 flex items-center justify-center gap-1.5 rounded-md bg-white border border-line text-ink px-3 py-2 text-sm font-medium hover:bg-slate/5 transition-colors shadow-sm">
-                  <FileSignature size={14} /> Update
-                </button>
-                <button onClick={() => setAccessOpen(true)} className="flex-1 flex items-center justify-center gap-1.5 rounded-md bg-white border border-line text-ink px-3 py-2 text-sm font-medium hover:bg-slate/5 transition-colors shadow-sm">
-                  <Key size={14} /> Access
-                </button>
-              </div>
+            { (user.role === 'ADMIN' || (user.role === 'LAWYER' && doc.ownerId === user.id)) && (
+              <button onClick={() => setUpdateOpen(true)} className="w-full flex items-center justify-center gap-1.5 rounded-md bg-white border border-line text-ink px-3 py-2 text-sm font-medium hover:bg-slate/5 transition-colors shadow-sm mb-2">
+                <FileSignature size={14} /> Update Version
+              </button>
+            )}
+            { (user.role === 'JUDGE' || user.role === 'ADMIN') && (
+              <button onClick={() => setAccessOpen(true)} className="w-full flex items-center justify-center gap-1.5 rounded-md bg-white border border-line text-ink px-3 py-2 text-sm font-medium hover:bg-slate/5 transition-colors shadow-sm">
+                <Key size={14} /> Manage Access
+              </button>
             )}
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function DocumentDetail() {
               </div>
               
               <div>
-                <p className="text-[10px] text-slate font-bold uppercase tracking-widest mb-1.5">IPFS Storage CID</p>
+                <p className="text-[10px] text-slate font-bold uppercase tracking-widest mb-1.5">Storage Reference</p>
                 <HashChip value={doc.cid} chars={28} />
               </div>
 
@@ -205,20 +205,22 @@ export default function DocumentDetail() {
                 </div>
                 <span className="text-xs font-mono text-slate bg-slate/10 px-2 py-0.5 rounded">FULL</span>
               </div>
-              
-              {/* Mocking shared users */}
-              <div className="px-5 py-3 border-b border-line flex justify-between items-center">
+            {doc.sharedWith && doc.sharedWith.map((sw) => (
+              <div key={sw.id} className="px-5 py-3 border-b border-line flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-slate text-white flex items-center justify-center text-[10px] font-bold">C</div>
+                  <div className="w-6 h-6 rounded-full bg-slate text-white flex items-center justify-center text-[10px] font-bold">
+                    {sw.role.charAt(0)}
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-ink">Rahul Sharma</p>
-                    <p className="text-[10px] text-slate">Client</p>
+                    <p className="text-sm font-medium text-ink">{sw.id.slice(0, 8)}...</p>
+                    <p className="text-[10px] text-slate">{sw.role}</p>
                   </div>
                 </div>
                 <span className="text-xs font-mono text-slate bg-slate/10 px-2 py-0.5 rounded">READ</span>
               </div>
+            ))}
             </div>
-            {(user.role === 'LAWYER' || user.role === 'ADMIN') && (
+            {(user.role === 'JUDGE' || user.role === 'ADMIN') && (
               <div className="p-3 bg-[#FAFAFA]">
                 <button onClick={() => setAccessOpen(true)} className="w-full py-1.5 text-xs font-medium text-ink border border-line rounded bg-white hover:bg-slate/5 transition-colors">
                   Modify Access
@@ -227,7 +229,7 @@ export default function DocumentDetail() {
             )}
           </div>
           
-          {(user.role === 'LAWYER' || user.role === 'ADMIN') && (
+          {(user.role === 'ADMIN' || (user.role === 'LAWYER' && doc.ownerId === user.id)) && (
             <div className="pt-4">
               <button onClick={() => setDeleteOpen(true)} className="flex items-center gap-2 text-xs font-semibold text-maroon hover:text-maroon-dark transition-colors">
                 <Trash2 size={14} /> Request Document Deletion

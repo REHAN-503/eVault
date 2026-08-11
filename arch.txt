@@ -1,0 +1,205 @@
+.
+├── arch.txt
+├── backend
+│   ├── docker
+│   │   └── README.md
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── docs
+│   │   ├── CONTRACTS.md
+│   │   ├── evault-postman-collection.json
+│   │   └── TEAM_API_CONTRACT.md
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── prisma
+│   │   ├── migrations
+│   │   └── schema.prisma
+│   ├── README.md
+│   ├── run.md
+│   ├── scripts
+│   │   └── seed.js
+│   ├── src
+│   │   ├── app.js
+│   │   ├── config
+│   │   ├── constants
+│   │   ├── controllers
+│   │   ├── docs
+│   │   ├── middlewares
+│   │   ├── models
+│   │   ├── repositories
+│   │   ├── routes
+│   │   ├── server.js
+│   │   ├── services
+│   │   ├── types
+│   │   ├── utils
+│   │   └── validators
+│   ├── storage_vault
+│   │   ├── Qm168e1fd34a3ec3db81170ec450078ce9a5fa55247b01.enc
+│   │   ├── Qm334160f453dd196fca89d5a91421bf7604aff468f1c0.enc
+│   │   ├── Qm6316475c41e345b5243dd942467610bbc81455ec2e49.enc
+│   │   ├── Qm79e4f1ba8c08dad0abb1b669416fa374f03a82c5ab50.enc
+│   │   ├── Qm7ad9d527dadc7a9a069ff4c2ae9b4577d63c02a5a54f.enc
+│   │   ├── Qm7cfd6ffbf68b1014da29b077868b43489fbe96bbab40.enc
+│   │   ├── Qm87416c26943ea89200aa90a0154455cd45fc708f8d0b.enc
+│   │   ├── Qm8ed45cf3851001cabcc58a346925a36b0a049a59137e.enc
+│   │   ├── Qmb21a6e805f93b22685a4c78ba42505ac40cb52e87adc.enc
+│   │   └── Qmbb5a5d815f9e51b266c0dc012b912d8120cac67635ad.enc
+│   ├── test_output.log
+│   ├── tests
+│   │   ├── auth.test.js
+│   │   ├── blockchain.test.js
+│   │   ├── document.test.js
+│   │   ├── setup.js
+│   │   └── system.test.js
+│   └── uploads
+│       ├── bafybeig06be06fd2c4203aa3e7438e742de8c0c19fc98a2ab5f86.pdf
+│       ├── bafybeig078de1f305edd10aba9606be01fd8d9e14229de1715418.pdf
+│       ├── bafybeig0f59465d31a02069c93228a8a38f0a2e7515b3357dcd1a.pdf
+│       ├── bafybeig13537c926f38d062764cce34cc3b7407a1ee96391f0b2b.pdf
+│       ├── bafybeig1da2eb67cab6b419f4c841fa01dbfab27fca1a36d3a2de.pdf
+│       ├── bafybeig1f9c09a409dfd66f85e6007539254a254c16efe3426214.pdf
+│       ├── bafybeig33c99f5cf126ec7713506ea376c41f1dfff13793131ed7.pdf
+│       ├── bafybeig4075f5e6834622873e7696cd053ea07745e1e8030c6270.pdf
+│       ├── bafybeig46decbd413396113e1e80cf990b0279906ceadd019378b.pdf
+│       ├── bafybeig5434b7437da59e3517d2c900aaba5597bee2d62ee3038c.pdf
+│       ├── bafybeig5553e151e2cc5448c3f93a4f2c78def6a81a4e2c598a95.pdf
+│       ├── bafybeig5e268ea9f4cda2484b292ba46b9b127b8d229cf81a7de8.pdf
+│       ├── bafybeig664758982d968c43bd9a0874e5167773b30fd2480d9f40.pdf
+│       ├── bafybeig6d16edefd0d7abb646697000eba08c8fe5f703a6394eff.pdf
+│       ├── bafybeig6d718e99084c08055f3a9be0a0c1210e9ae8eea63da2ab.pdf
+│       ├── bafybeig7784b3d98cc36672603f2a6c0f568ee6cb088f922cfbe9.pdf
+│       ├── bafybeig80d84c7a58cfaf7bbad8bd06bb7dd6330f787ad562183f.pdf
+│       ├── bafybeig83a9dc6b27b741722bb9d1265a8005491131fdba97880c.pdf
+│       ├── bafybeig91c9e9e560b92faa938e15bd100b8cc61feb4261ad80c7.pdf
+│       ├── bafybeig96e080469b6a087e6fc9ccbb3733f4b5aa11ebcfbcd3e2.pdf
+│       ├── bafybeig9befa9454a7e461e1a0cf830f352051041b02f35513aea.pdf
+│       ├── bafybeigc4a1fd991764c0952cdb24d3525ed309cc023950b03be3.pdf
+│       ├── bafybeige87fff98663ecacf5c0460d964238c84e7631cb80228fb.pdf
+│       └── bafybeigf2aca7a038722c6fd2b3b809b78fe7380425c75b72c820.pdf
+├── chaincode
+│   ├── docker
+│   │   └── docker-entrypoint.sh
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── src
+│   │   ├── accessControl.contract.test.ts
+│   │   ├── accessControl.contract.ts
+│   │   ├── auditLog.contract.test.ts
+│   │   ├── auditLog.contract.ts
+│   │   ├── documentRegistry.contract.test.ts
+│   │   ├── documentRegistry.contract.ts
+│   │   ├── errors.ts
+│   │   ├── index.ts
+│   │   ├── ledgerHelpers.ts
+│   │   ├── testHelpers
+│   │   ├── types.ts
+│   │   └── validation.ts
+│   └── tsconfig.json
+├── docker
+│   ├── fabric-bootstrap
+│   │   ├── Dockerfile
+│   │   ├── fabric-bootstrap.sh
+│   │   └── start-fabric.sh
+│   └── frontend
+│       ├── Dockerfile
+│       └── nginx.conf
+├── docker-compose.yml
+├── dummy.pdf
+├── e2e_integration_test.js
+├── fabric
+│   ├── bin
+│   │   ├── configtxgen
+│   │   ├── configtxlator
+│   │   ├── cryptogen
+│   │   ├── discover
+│   │   ├── fabric-ca-client
+│   │   ├── fabric-ca-server
+│   │   ├── ledgerutil
+│   │   ├── orderer
+│   │   ├── osnadmin
+│   │   └── peer
+│   ├── config
+│   │   ├── configtx.yaml
+│   │   ├── core.yaml
+│   │   └── orderer.yaml
+│   └── test-network
+│       ├── addOrg3
+│       ├── allowed-download.txt
+│       ├── backend-fabric-test.txt
+│       ├── bft-config
+│       ├── CHAINCODE_AS_A_SERVICE_TUTORIAL.md
+│       ├── channel-artifacts
+│       ├── client-allowed-download.txt
+│       ├── compose
+│       ├── configtx
+│       ├── evaultcc.tar.gz
+│       ├── log.txt
+│       ├── monitordocker.sh
+│       ├── network.config
+│       ├── network.sh
+│       ├── organizations
+│       ├── prometheus-grafana
+│       ├── README.md
+│       ├── revoked-download.txt
+│       ├── scripts
+│       ├── setOrgEnv.sh
+│       └── system-genesis-block
+├── frontend
+│   ├── docs
+│   │   ├── FRONTEND_INTEGRATION.md
+│   │   └── FRONTEND_INTEGRATION.md:Zone.Identifier
+│   ├── index.html
+│   ├── index.html:Zone.Identifier
+│   ├── nginx.conf
+│   ├── package.json
+│   ├── package.json:Zone.Identifier
+│   ├── package-lock.json
+│   ├── postcss.config.js
+│   ├── postcss.config.js:Zone.Identifier
+│   ├── public
+│   │   ├── seal.svg
+│   │   └── seal.svg:Zone.Identifier
+│   ├── README.md
+│   ├── README.md:Zone.Identifier
+│   ├── src
+│   │   ├── api
+│   │   ├── App.jsx
+│   │   ├── App.jsx:Zone.Identifier
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── context
+│   │   ├── index.css
+│   │   ├── index.css:Zone.Identifier
+│   │   ├── main.jsx
+│   │   ├── main.jsx:Zone.Identifier
+│   │   ├── pages
+│   │   ├── routes
+│   │   └── services
+│   ├── tailwind.config.js
+│   ├── tailwind.config.js:Zone.Identifier
+│   ├── vite.config.js
+│   └── vite.config.js:Zone.Identifier
+├── gateway
+│   ├── live-test.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── src
+│   │   ├── connection.ts
+│   │   ├── connection.ts.backup
+│   │   ├── errors.test.ts
+│   │   ├── errors.ts
+│   │   └── index.ts
+│   └── tsconfig.json
+├── README.md
+├── scripts
+│   ├── start.sh
+│   ├── status.sh
+│   └── stop.sh
+└── storage_vault
+    ├── local-5ca662b193c33a6235432715fc2c42338b660430182d27ae78cfd6960eccbf3e.enc
+    └── local-adfe5ebbc420841fefe8b317f93335eb83cf3eb0f10e426516a8ec22a1c220d3.enc
+
+58 directories, 145 files

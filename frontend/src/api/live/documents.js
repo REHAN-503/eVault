@@ -32,8 +32,8 @@ export async function uploadDocument({ title, caseNo, file }, onStep) {
   const steps = [
     'Encrypting file (AES-256, client-side)',
     'Authenticating request at API Gateway',
-    'Pushing encrypted object to IPFS',
-    'Content hash (CID) returned',
+    'Pushing encrypted object to secure storage',
+    'Storage reference returned',
     'Calling DocumentRegistryContract.recordDocument()',
     'Writing hash + metadata to ledger',
     'DocumentAdded event confirmed',
@@ -72,6 +72,11 @@ export async function checkAccess(docId, userId) {
   }
 }
 
+export async function verifyLedger(docId) {
+  const { data } = await client.get(`/documents/${docId}/verify`);
+  return data.data;
+}
+
 export async function grantAccess(docId, userId, permission = 'READ') {
   const { data } = await client.post(`/documents/${docId}/share`, { userId, permission });
   return data.data;
@@ -91,7 +96,7 @@ export async function updateDocument(docId, { file }, onStep) {
   const steps = [
     'Encrypting new version (AES-256)',
     'Authenticating request',
-    'Uploading file to IPFS',
+    'Uploading file to secure storage',
     'Updating DocumentRegistryContract',
     'DocumentUpdated event confirmed',
   ];
