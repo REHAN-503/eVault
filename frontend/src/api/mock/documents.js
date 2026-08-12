@@ -211,6 +211,20 @@ export async function updateDocument(docId, { file }, onStep) {
   return doc;
 }
 
+export async function verifyLedger(docId) {
+  await mockDelay(500);
+  const doc = getDocuments().find((d) => d.docId === docId || d.id === docId);
+  if (!doc) throw new Error('Document not found');
+  // Mock always matches because the mock data is self-consistent
+  return {
+    verified: true,
+    docId: doc.docId,
+    databaseHash: doc.hash,
+    ledgerHash: doc.hash,
+    match: true,
+  };
+}
+
 export async function deleteDocument(docId) {
   await mockDelay(600);
   const docs = getDocuments();

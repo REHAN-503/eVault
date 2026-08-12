@@ -52,3 +52,9 @@ fabric/test-network/docker/docker-compose-*.yaml
 # Temporary files
 tmp/
 temp/
+
+# Test scripts and temporary data
+create-db.js
+test-pg.js
+dummy.pdf
+e2e_integration_test.js
