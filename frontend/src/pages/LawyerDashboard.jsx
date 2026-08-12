@@ -29,20 +29,29 @@ export default function LawyerDashboard() {
 
   async function refresh() {
     setLoading(true);
-    const data = await listDocuments();
-    const own = data.filter((d) => d.ownerId === user?.id);
-    const shared = data.filter((d) => d.ownerId !== user?.id);
-    setMyDocs(own);
-    setSharedDocs(shared);
+    try {
+      const data = await listDocuments();
+      const own = data.filter((d) => d.ownerId === user?.id);
+      const shared = data.filter((d) => d.ownerId !== user?.id);
+      setMyDocs(own);
+      setSharedDocs(shared);
 
-    if (own.length > 0) {
-      const audits = await getDocumentAudit(own[0].docId);
-      setRecentAudit(audits.slice(0, 5));
-    } else {
-      setRecentAudit([]);
+      if (own.length > 0) {
+        try {
+          const audits = await getDocumentAudit(own[0].id);
+          setRecentAudit(audits.slice(0, 5));
+        } catch (auditErr) {
+          console.error('Failed to load recent audits', auditErr);
+          setRecentAudit([]);
+        }
+      } else {
+        setRecentAudit([]);
+      }
+    } catch (err) {
+      console.error('Failed to list documents', err);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   useEffect(() => {
