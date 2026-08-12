@@ -7,7 +7,13 @@ const prisma = require('../config/database');
  */
 
 async function create(data) {
-  return prisma.documentMetadata.create({ data });
+  return prisma.documentMetadata.create({
+    data,
+    include: {
+      owner: { select: { id: true, email: true, fullName: true, role: true } },
+      sharedWith: { select: { id: true, role: true } },
+    },
+  });
 }
 
 async function findById(id) {
