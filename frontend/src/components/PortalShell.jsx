@@ -284,7 +284,7 @@ export default function PortalShell({ role, user, children }) {
                   {user?.name?.charAt(0) || <User size={16} />}
                 </div>
                 <div className="hidden lg:block">
-                  <p className="text-sm font-semibold text-ink leading-none mb-1">{user?.name || 'User'}</p>
+                  <p className="text-sm font-semibold text-ink leading-none mb-1">{user?.name || user?.fullName || 'User'}</p>
                   <p className="text-[10px] text-slate font-mono">{user?.id || 'ID Unknown'}</p>
                 </div>
               </button>
@@ -298,7 +298,7 @@ export default function PortalShell({ role, user, children }) {
                     className="absolute top-full mt-3 right-0 w-64 bg-white border border-line rounded-xl shadow-2xl z-50 overflow-hidden"
                   >
                     <div className="p-4 border-b border-line bg-paper-dim/50">
-                      <p className="text-sm font-semibold text-ink">{user?.name}</p>
+                      <p className="text-sm font-semibold text-ink">{user?.name || user?.fullName}</p>
                       <p className="text-xs text-slate">{user?.email}</p>
                       <div className="mt-2 flex items-center gap-1 text-[10px] font-mono text-slate bg-white border border-line px-2 py-1 rounded-md inline-flex">
                         <Key size={10} /> {user?.id}

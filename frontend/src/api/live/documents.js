@@ -49,7 +49,6 @@ export async function uploadDocument({ title, caseNo, file }, onStep) {
   
   onStep?.(1, steps[1]);
   const { data } = await client.post('/documents/upload', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: (evt) => {
       const progress = Math.round((evt.loaded / evt.total) * 100);
       if (progress > 20) onStep?.(2, steps[2]);
@@ -108,7 +107,6 @@ export async function updateDocument(docId, { file }, onStep) {
 
   onStep?.(1, steps[1]);
   const { data } = await client.put(`/documents/${docId}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: (evt) => {
       const progress = Math.round((evt.loaded / evt.total) * 100);
       if (progress > 20) onStep?.(2, steps[2]);
