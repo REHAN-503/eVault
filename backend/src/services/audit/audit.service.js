@@ -67,11 +67,7 @@ async function logAction(docId, userId, action, metadata = null) {
   try {
     // Attempt to log to Fabric if the function exists (mock may omit it)
     if (typeof blockchainService.logAction === 'function') {
-      const blockchainResult = await blockchainService.logAction(
-        document.docId,
-        userId,
-        action
-      );
+      const blockchainResult = await blockchainService.logAction(document.docId, userId, action);
       logger.debug('audit.fabric.success', {
         backendDocId: docId,
         fabricDocId: document.docId,

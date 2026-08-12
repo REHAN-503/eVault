@@ -5,7 +5,8 @@ const logger = require('../../utils/logger');
 const path = require('path');
 
 // Determine storage directory from config or fallback
-const storageDir = process.env.LOCAL_STORAGE_DIR || path.join(__dirname, '../../../../storage_vault');
+const storageDir =
+  process.env.LOCAL_STORAGE_DIR || path.join(__dirname, '../../../../storage_vault');
 const activeProvider = new LocalStorageProvider(storageDir);
 
 /**

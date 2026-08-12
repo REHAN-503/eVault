@@ -45,7 +45,11 @@ export default function LawyerDashboard() {
     setLoading(false);
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    if (user) {
+      refresh();
+    }
+  }, [user]);
 
   const verified = myDocs.filter((d) => d.status === 'verified').length + sharedDocs.filter((d) => d.status === 'verified').length;
   const total = myDocs.length + sharedDocs.length;
@@ -94,7 +98,7 @@ export default function LawyerDashboard() {
                     <tr
                       key={d.docId}
                       className="hover:bg-paper-dim/50 transition-colors group cursor-pointer"
-                      onClick={() => navigate(`/documents/${d.docId}`)}
+                      onClick={() => navigate(`/documents/${d.id}`)}
                     >
                       <td className="px-6 py-5">
                         <div className="flex items-start gap-3">
@@ -116,7 +120,7 @@ export default function LawyerDashboard() {
                       <td className="px-6 py-5 text-xs text-slate font-medium">{new Date(d.updatedAt).toLocaleDateString()}</td>
                       <td className="px-6 py-5 text-right">
                         <Link
-                          to={`/documents/${d.docId}`}
+                          to={`/documents/${d.id}`}
                           onClick={(e) => e.stopPropagation()}
                           className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-line text-slate hover:bg-white hover:text-ink hover:border-slate/30 transition-all shadow-sm"
                           aria-label={`Open ${d.docId}`}
@@ -172,7 +176,7 @@ export default function LawyerDashboard() {
                     <tr
                       key={d.docId}
                       className="hover:bg-paper-dim/50 transition-colors group cursor-pointer"
-                      onClick={() => navigate(`/documents/${d.docId}`)}
+                      onClick={() => navigate(`/documents/${d.id}`)}
                     >
                       <td className="px-6 py-5">
                         <div className="flex items-start gap-3">
@@ -193,7 +197,7 @@ export default function LawyerDashboard() {
                       <td className="px-6 py-5 text-xs text-slate font-medium">{new Date(d.updatedAt).toLocaleDateString()}</td>
                       <td className="px-6 py-5 text-right">
                         <Link
-                          to={`/documents/${d.docId}`}
+                          to={`/documents/${d.id}`}
                           onClick={(e) => e.stopPropagation()}
                           className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-line text-slate hover:bg-white hover:text-ink hover:border-slate/30 transition-all shadow-sm"
                           aria-label={`Open ${d.docId}`}

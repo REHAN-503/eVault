@@ -77,7 +77,7 @@ export default function ClientDashboard() {
                  <td className="px-6 py-5"><StatusPill status={d.status} /></td>
                  <td className="px-6 py-5 text-xs text-slate font-medium">{new Date(d.updatedAt).toLocaleDateString()}</td>
                  <td className="px-6 py-5 text-right">
-                   <Link to={`/documents/${d.docId}`} className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-white text-xs font-semibold text-ink border border-line hover:bg-slate/5 transition-all shadow-sm">
+                   <Link to={`/documents/${d.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-white text-xs font-semibold text-ink border border-line hover:bg-slate/5 transition-all shadow-sm">
                      Open Record <ExternalLink size={14} />
                    </Link>
                  </td>

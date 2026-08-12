@@ -23,17 +23,17 @@ class LocalStorageProvider {
    * Upload encrypted file buffer to local storage.
    * Generates a deterministic content-addressable identifier (CID-like) based on SHA-256 hash.
    */
-  async upload(encryptedBuffer, metadata) {
+  async upload(encryptedBuffer, _metadata) {
     // Generate a content-addressed identifier based on the file content.
     // This is NOT a real IPFS CID, but it serves the same deterministic purpose for local storage.
     const hash = crypto.createHash('sha256').update(encryptedBuffer).digest('hex');
     const cid = `local-${hash}`;
-    
+
     const filePath = path.join(this.storageDir, `${cid}.enc`);
-    
+
     await writeFile(filePath, encryptedBuffer);
     logger.info(`File stored locally with identifier: ${cid}`);
-    
+
     return { cid };
   }
 
@@ -42,7 +42,7 @@ class LocalStorageProvider {
    */
   async download(cid) {
     const filePath = path.join(this.storageDir, `${cid}.enc`);
-    
+
     try {
       const buffer = await readFile(filePath);
       return buffer;

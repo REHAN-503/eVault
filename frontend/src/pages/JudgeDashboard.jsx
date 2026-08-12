@@ -21,10 +21,10 @@ export default function JudgeDashboard() {
     })();
   }, []);
 
-  async function handleVerify(docId) {
+  async function handleVerify(id, docId) {
     setVerifying(docId);
     try {
-      const res = await verifyLedger(docId);
+      const res = await verifyLedger(id);
       setVerifiedIds((prev) => ({ ...prev, [docId]: res.match }));
       if (res.match) {
         toast.success(`Ledger matched for ${docId}`);
@@ -113,7 +113,7 @@ export default function JudgeDashboard() {
                       <td className="px-6 py-5">
                         {verifiedIds[d.docId] === undefined ? (
                           <button
-                            onClick={() => handleVerify(d.docId)}
+                            onClick={() => handleVerify(d.id, d.docId)}
                             disabled={verifying === d.docId}
                             className="flex items-center gap-1.5 rounded bg-white border border-line text-ink px-3 py-1.5 text-xs font-semibold hover:border-ink transition-all disabled:opacity-50 shadow-sm"
                           >
@@ -131,7 +131,7 @@ export default function JudgeDashboard() {
                         )}
                       </td>
                       <td className="px-6 py-5 text-right">
-                        <Link to={`/documents/${d.docId}`} className="inline-flex items-center gap-1 text-xs font-semibold text-ink bg-white border border-line px-3 py-1.5 rounded hover:bg-slate/5 transition-colors shadow-sm">
+                        <Link to={`/documents/${d.id}`} className="inline-flex items-center gap-1 text-xs font-semibold text-ink bg-white border border-line px-3 py-1.5 rounded hover:bg-slate/5 transition-colors shadow-sm">
                           Review <ChevronRight size={14} />
                         </Link>
                       </td>

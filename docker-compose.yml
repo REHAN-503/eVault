@@ -44,6 +44,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      GRPC_DNS_RESOLVER: native
       DATABASE_URL: "postgresql://evault:evault_secret@evault-postgres:5432/evault_db?schema=public"
       JWT_SECRET: change-me-to-a-long-random-secret
       JWT_ACCESS_EXPIRY: 15m

@@ -25,11 +25,9 @@ function createError(message, statusCode, errorCode, details = '') {
  * Generate a JWT access token.
  */
 function generateAccessToken(user) {
-  return jwt.sign(
-    { sub: user.id, email: user.email, role: user.role },
-    config.jwt.secret,
-    { expiresIn: config.jwt.accessExpiry }
-  );
+  return jwt.sign({ sub: user.id, email: user.email, role: user.role }, config.jwt.secret, {
+    expiresIn: config.jwt.accessExpiry,
+  });
 }
 
 /**
@@ -103,11 +101,7 @@ async function login({ email, password }) {
         ? 'Your account registration was rejected'
         : 'Your account is awaiting administrator approval';
 
-    throw createError(
-      message,
-      HTTP_STATUS.FORBIDDEN,
-      ERROR_CODES.AUTHORIZATION_ERROR
-    );
+    throw createError(message, HTTP_STATUS.FORBIDDEN, ERROR_CODES.AUTHORIZATION_ERROR);
   }
 
   const accessToken = generateAccessToken(user);
@@ -148,7 +142,7 @@ async function refresh(refreshToken) {
 
   // Rotate: revoke old, issue new
   const revokeResult = await sessionRepository.revokeByTokenHash(refreshTokenHash);
-  
+
   if (revokeResult.count === 0) {
     // Concurrent request or token theft detected! The token was already revoked.
     await sessionRepository.revokeAllForUser(session.userId);
@@ -161,11 +155,7 @@ async function refresh(refreshToken) {
 
   const user = await userRepository.findById(session.userId);
   if (!user) {
-    throw createError(
-      'User not found',
-      HTTP_STATUS.NOT_FOUND,
-      ERROR_CODES.NOT_FOUND
-    );
+    throw createError('User not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
 
   const newAccessToken = generateAccessToken(user);
@@ -194,11 +184,7 @@ async function logout(refreshToken) {
 async function getProfile(userId) {
   const user = await userRepository.findById(userId);
   if (!user) {
-    throw createError(
-      'User not found',
-      HTTP_STATUS.NOT_FOUND,
-      ERROR_CODES.NOT_FOUND
-    );
+    throw createError('User not found', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
   }
   return user;
 }

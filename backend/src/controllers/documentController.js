@@ -19,15 +19,26 @@ function mapDocumentForFrontend(doc) {
     size: `${(doc.sizeBytes / (1024 * 1024)).toFixed(1)} MB`,
     version: doc.version,
     updatedAt: doc.updatedAt,
-    sharedWith: doc.sharedWith ? doc.sharedWith.map(u => u.id) : [],
+    sharedWith: doc.sharedWith ? doc.sharedWith.map((u) => u.id) : [],
   };
 }
 
 async function upload(req, res, next) {
   try {
     const { title, caseNo } = req.body;
-    const document = await documentService.uploadDocument(req.file, req.user.id, req.user.role, title, caseNo);
-    return success(res, 'Document uploaded successfully', mapDocumentForFrontend(document), HTTP_STATUS.CREATED);
+    const document = await documentService.uploadDocument(
+      req.file,
+      req.user.id,
+      req.user.role,
+      title,
+      caseNo
+    );
+    return success(
+      res,
+      'Document uploaded successfully',
+      mapDocumentForFrontend(document),
+      HTTP_STATUS.CREATED
+    );
   } catch (err) {
     next(err);
   }
@@ -60,11 +71,7 @@ async function list(req, res, next) {
 
 async function getById(req, res, next) {
   try {
-    const document = await documentService.getDocument(
-      req.params.id,
-      req.user.id,
-      req.user.role
-    );
+    const document = await documentService.getDocument(req.params.id, req.user.id, req.user.role);
     return success(res, 'Document retrieved successfully', mapDocumentForFrontend(document));
   } catch (err) {
     next(err);
@@ -107,11 +114,7 @@ async function update(req, res, next) {
 
 async function remove(req, res, next) {
   try {
-    const result = await documentService.deleteDocument(
-      req.params.id,
-      req.user.id,
-      req.user.role
-    );
+    const result = await documentService.deleteDocument(req.params.id, req.user.id, req.user.role);
     return success(res, 'Document deleted successfully', result);
   } catch (err) {
     next(err);
@@ -175,11 +178,7 @@ async function audit(req, res, next) {
 
 async function verifyLedger(req, res, next) {
   try {
-    const result = await documentService.verifyLedger(
-      req.params.id,
-      req.user.id,
-      req.user.role
-    );
+    const result = await documentService.verifyLedger(req.params.id, req.user.id, req.user.role);
     return success(res, 'Ledger verification complete', result);
   } catch (err) {
     next(err);

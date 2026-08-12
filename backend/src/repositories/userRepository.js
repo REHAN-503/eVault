@@ -49,7 +49,6 @@ async function create({ email, passwordHash, role, fullName }) {
   });
 }
 
-
 async function updateStatus(id, status) {
   return prisma.user.update({
     where: { id },

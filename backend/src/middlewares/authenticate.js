@@ -35,9 +35,7 @@ function authenticate(req, res, next) {
     next();
   } catch (err) {
     const message =
-      err.name === 'TokenExpiredError'
-        ? 'Access token has expired'
-        : 'Invalid access token';
+      err.name === 'TokenExpiredError' ? 'Access token has expired' : 'Invalid access token';
 
     return error(
       res,

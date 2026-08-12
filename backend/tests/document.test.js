@@ -1,7 +1,7 @@
 'use strict';
 
 const request = require('supertest');
-const path = require('path');
+
 
 // Set test env vars BEFORE importing app
 process.env.NODE_ENV = 'test';
@@ -217,7 +217,7 @@ describe('Document Flow', () => {
       const doc = await prisma.documentMetadata.findUnique({ where: { id: documentId } });
       await prisma.documentMetadata.update({
         where: { id: documentId },
-        data: { currentHash: 'altered_hash_for_testing' }
+        data: { currentHash: 'altered_hash_for_testing' },
       });
 
       const res = await request(app)
@@ -232,7 +232,7 @@ describe('Document Flow', () => {
       // Restore hash
       await prisma.documentMetadata.update({
         where: { id: documentId },
-        data: { currentHash: doc.currentHash }
+        data: { currentHash: doc.currentHash },
       });
     });
 

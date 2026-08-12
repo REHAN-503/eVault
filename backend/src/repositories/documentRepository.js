@@ -27,14 +27,9 @@ async function findByDocId(docId) {
 async function findByOwner(ownerId, { page, limit, search }) {
   const skip = (page - 1) * limit;
   const where = {
-    OR: [
-      { ownerId },
-      { sharedWith: { some: { id: ownerId } } }
-    ],
+    OR: [{ ownerId }, { sharedWith: { some: { id: ownerId } } }],
     isDeleted: false,
-    ...(search
-      ? { filename: { contains: search, mode: 'insensitive' } }
-      : {}),
+    ...(search ? { filename: { contains: search, mode: 'insensitive' } } : {}),
   };
 
   const [documents, total] = await Promise.all([
@@ -43,9 +38,9 @@ async function findByOwner(ownerId, { page, limit, search }) {
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
-      include: { 
+      include: {
         owner: { select: { id: true, email: true, fullName: true, role: true } },
-        sharedWith: { select: { id: true, role: true } }
+        sharedWith: { select: { id: true, role: true } },
       },
     }),
     prisma.documentMetadata.count({ where }),
@@ -58,9 +53,7 @@ async function findAll({ page, limit, search }) {
   const skip = (page - 1) * limit;
   const where = {
     isDeleted: false,
-    ...(search
-      ? { filename: { contains: search, mode: 'insensitive' } }
-      : {}),
+    ...(search ? { filename: { contains: search, mode: 'insensitive' } } : {}),
   };
 
   const [documents, total] = await Promise.all([
@@ -69,9 +62,9 @@ async function findAll({ page, limit, search }) {
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
-      include: { 
+      include: {
         owner: { select: { id: true, email: true, fullName: true, role: true } },
-        sharedWith: { select: { id: true, role: true } }
+        sharedWith: { select: { id: true, role: true } },
       },
     }),
     prisma.documentMetadata.count({ where }),

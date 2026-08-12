@@ -34,7 +34,7 @@ COPY backend/src ./src
 COPY backend/scripts ./scripts
 
 # Runtime directories
-RUN mkdir -p /app/uploads /app/storage_vault
+RUN mkdir -p /app/uploads /app/storage_vault && chown -R node:node /app/uploads /app/storage_vault
 
 # The Fabric Admin identity is mounted read-only at runtime.
 # The node user is UID 1000 on the official Node image,

@@ -32,8 +32,8 @@ async function queryExternalDatabase(caseNumber) {
         caseNumber,
         summary: 'Historical precedence record for the given case.',
         judgementDate: '2023-05-12',
-      }
-    ]
+      },
+    ],
   };
 }
 

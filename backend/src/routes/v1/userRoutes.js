@@ -20,10 +20,6 @@ router.use(authenticate);
  *       200:
  *         description: List of approved lawyers
  */
-router.get(
-  '/lawyers',
-  requireRole('JUDGE', 'ADMIN'),
-  userController.listApprovedLawyers
-);
+router.get('/lawyers', requireRole('JUDGE', 'ADMIN'), userController.listApprovedLawyers);
 
 module.exports = router;

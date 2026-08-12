@@ -7,12 +7,7 @@ const adminController = require('../../controllers/adminController');
 
 const router = Router();
 
-router.get(
-  '/users',
-  authenticate,
-  requireRole('ADMIN'),
-  adminController.listUsers
-);
+router.get('/users', authenticate, requireRole('ADMIN'), adminController.listUsers);
 
 router.patch(
   '/users/:id/status',

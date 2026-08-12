@@ -37,18 +37,19 @@ async function run() {
   console.log("✅ Admin login successful");
 
   console.log("\\n--- 2. Client Registration ---");
+  console.log("\n--- 2. Client Registration ---");
   const regRes = await request('/auth/register', 'POST', { 
     email: newClientEmail, password: 'Password123', fullName: 'Demo Client', role: 'CLIENT' 
   });
   newClientId = regRes.data.data.id;
   console.log("✅ Client registered");
 
-  console.log("\\n--- 3. Client approval ---");
-  const approveRes = await request(`/users/${newClientId}/status`, 'PATCH', { status: 'APPROVED' }, adminToken);
+  console.log("\n--- 3. Client approval ---");
+  const approveRes = await request(`/admin/users/${newClientId}/status`, 'PATCH', { status: 'APPROVED' }, adminToken);
   if (approveRes.status !== 200) throw new Error('Client approval failed');
   console.log("✅ Client approved by admin");
 
-  console.log("\\n--- 4. Client login ---");
+  console.log("\n--- 4. Client login ---");
   const clientLoginRes = await request('/auth/login', 'POST', { email: newClientEmail, password: 'Password123' });
   if (clientLoginRes.status === 200) clientToken = clientLoginRes.data.data.accessToken;
   else throw new Error('Client login failed');
@@ -71,7 +72,7 @@ async function run() {
   if (uploadRes.status === 201) {
     docId = uploadRes.data.data.id;
     console.log("✅ Document uploaded successfully. ID:", docId);
-  } else throw new Error('Document upload failed');
+  } else throw new Error('Document upload failed: Status ' + uploadRes.status + ' - ' + JSON.stringify(uploadRes.data));
 
   console.log("\\n--- 7. Document verification ---");
   const getDocRes = await request(`/documents/${docId}`, 'GET', null, lawyerToken);
@@ -79,18 +80,19 @@ async function run() {
   else throw new Error('Document verification failed');
 
   console.log("\\n--- 8. Version update ---");
+  console.log("\n--- 8. Version update ---");
   const updateData = new FormData();
   updateData.append('file', fileBlob, 'dummy_v2.pdf');
   const updateRes = await request(`/documents/${docId}`, 'PUT', updateData, lawyerToken);
   if (updateRes.status === 200) console.log("✅ Version updated successfully");
   else throw new Error('Version update failed');
 
-  console.log("\\n--- 9. Access grant ---");
+  console.log("\n--- 9. Access grant ---");
   const grantRes = await request(`/documents/${docId}/share`, 'POST', { userId: newClientId, permission: 'READ' }, lawyerToken);
   if (grantRes.status === 200) console.log("✅ Access granted successfully");
-  else throw new Error('Access grant failed');
+  else throw new Error('Access grant failed: Status ' + grantRes.status + ' - ' + JSON.stringify(grantRes.data));
 
-  console.log("\\n--- 10. Client access ---");
+  console.log("\n--- 10. Client access ---");
   const authorizedGetRes = await request(`/documents/${docId}/download`, 'GET', null, clientToken);
   if (authorizedGetRes.status === 200) console.log("✅ Client accessed document successfully");
   else throw new Error('Client access failed');

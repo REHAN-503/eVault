@@ -57,12 +57,12 @@ async function syncWithCIS({ documentId, caseNumber, courtCode }) {
  */
 function getMockCourtName(courtCode) {
   const courts = {
-    'SC': 'Supreme Court of India',
-    'DHC': 'Delhi High Court',
-    'BHC': 'Bombay High Court',
-    'MHC': 'Madras High Court',
-    'KHC': 'Karnataka High Court',
-    'DIST01': 'District Court, Central Delhi',
+    SC: 'Supreme Court of India',
+    DHC: 'Delhi High Court',
+    BHC: 'Bombay High Court',
+    MHC: 'Madras High Court',
+    KHC: 'Karnataka High Court',
+    DIST01: 'District Court, Central Delhi',
   };
   return courts[courtCode] || `District Court (${courtCode})`;
 }

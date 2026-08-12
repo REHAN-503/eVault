@@ -11,9 +11,10 @@ const config = require('../config');
 // Define a custom token for the request ID
 morgan.token('reqId', (req) => req.id || '-');
 
-const format = config.env === 'production' 
-  ? '{"timestamp":":date[iso]","reqId":":reqId","method":":method","url":":url","status"::status,"responseTime":":response-time ms","remoteAddr":":remote-addr"}'
-  : '[:date[iso]] [INFO] [ReqID: :reqId] :method :url :status :response-time ms - :res[content-length]';
+const format =
+  config.env === 'production'
+    ? '{"timestamp":":date[iso]","reqId":":reqId","method":":method","url":":url","status"::status,"responseTime":":response-time ms","remoteAddr":":remote-addr"}'
+    : '[:date[iso]] [INFO] [ReqID: :reqId] :method :url :status :response-time ms - :res[content-length]';
 
 const requestLogger = morgan(format, {
   skip: (_req, res) => {

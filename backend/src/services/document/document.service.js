@@ -39,11 +39,17 @@ async function uploadDocument(file, userId, role, title, caseNo) {
   });
 
   // Record on blockchain
-  const blockchainResult = await blockchainService.recordDocument(docId, fileHash, {
-    filename: file.originalname,
-    mimetype: file.mimetype,
-    sizeBytes: file.size,
-  }, userId, role);
+  const blockchainResult = await blockchainService.recordDocument(
+    docId,
+    fileHash,
+    {
+      filename: file.originalname,
+      mimetype: file.mimetype,
+      sizeBytes: file.size,
+    },
+    userId,
+    role
+  );
 
   let document;
   try {
@@ -59,9 +65,16 @@ async function uploadDocument(file, userId, role, title, caseNo) {
       sizeBytes: file.size,
     });
   } catch (err) {
-    // If we fail here, storage and blockchain are written but DB is not. 
-    console.error(`[Upload Error] Partial failure: Storage/Fabric succeeded, DB failed for docId ${docId}`, err);
-    throw createError('Failed to persist document metadata after storage', HTTP_STATUS.INTERNAL_SERVER_ERROR, ERROR_CODES.INTERNAL_ERROR);
+    // If we fail here, storage and blockchain are written but DB is not.
+    console.error(
+      `[Upload Error] Partial failure: Storage/Fabric succeeded, DB failed for docId ${docId}`,
+      err
+    );
+    throw createError(
+      'Failed to persist document metadata after storage',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      ERROR_CODES.INTERNAL_ERROR
+    );
   }
 
   // Audit log
@@ -234,10 +247,14 @@ async function shareDocument(databaseId, targetUserId, permission, userId, role)
     );
   }
 
-  // Validate the target user exists and is a Lawyer. Status check removed to allow sharing with users pending approval (e.g., test user).
+  // Validate the target user exists and is a Lawyer or Client. Status check removed to allow sharing with users pending approval (e.g., test user).
   const targetUser = await require('../../repositories/userRepository').findById(targetUserId);
-  if (!targetUser || targetUser.role !== 'LAWYER') {
-    throw createError('Invalid target user for sharing (must be a Lawyer)', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
+  if (!targetUser || (targetUser.role !== 'LAWYER' && targetUser.role !== 'CLIENT')) {
+    throw createError(
+      'Invalid target user for sharing (must be a Lawyer or Client)',
+      HTTP_STATUS.BAD_REQUEST,
+      ERROR_CODES.VALIDATION_ERROR
+    );
   }
 
   // Force READ ONLY permission
@@ -247,7 +264,7 @@ async function shareDocument(databaseId, targetUserId, permission, userId, role)
 
   // Sync access to Postgres for efficient querying
   await documentRepository.update(databaseId, {
-    sharedWith: { connect: { id: targetUserId } }
+    sharedWith: { connect: { id: targetUserId } },
   });
 
   // Audit log
@@ -283,7 +300,7 @@ async function revokeDocument(databaseId, targetUserId, userId, role) {
 
   // Sync access to Postgres for efficient querying (Bug 5)
   await documentRepository.update(databaseId, {
-    sharedWith: { disconnect: { id: targetUserId } }
+    sharedWith: { disconnect: { id: targetUserId } },
   });
 
   // Audit log
@@ -311,11 +328,7 @@ async function getDocumentHistory(databaseId, userId, role) {
   if (!isOwner && !isPrivileged) {
     const hasAccess = await blockchainService.checkAccess(document.docId, userId);
     if (!hasAccess) {
-      throw createError(
-        'Access denied',
-        HTTP_STATUS.FORBIDDEN,
-        ERROR_CODES.AUTHORIZATION_ERROR
-      );
+      throw createError('Access denied', HTTP_STATUS.FORBIDDEN, ERROR_CODES.AUTHORIZATION_ERROR);
     }
   }
 
@@ -338,11 +351,7 @@ async function getDocumentAudit(databaseId, userId, role) {
   if (!isOwner && !isPrivileged) {
     const hasAccess = await blockchainService.checkAccess(document.docId, userId);
     if (!hasAccess) {
-      throw createError(
-        'Access denied',
-        HTTP_STATUS.FORBIDDEN,
-        ERROR_CODES.AUTHORIZATION_ERROR
-      );
+      throw createError('Access denied', HTTP_STATUS.FORBIDDEN, ERROR_CODES.AUTHORIZATION_ERROR);
     }
   }
 
@@ -371,7 +380,7 @@ async function verifyLedger(databaseId, userId, role) {
 
   try {
     const ledgerRecord = await blockchainService.getDocument(document.docId);
-    
+
     const isMatch = ledgerRecord.hash === document.currentHash;
 
     // Audit the verification
@@ -382,19 +391,19 @@ async function verifyLedger(databaseId, userId, role) {
       ledgerHash: ledgerRecord.hash,
     });
 
-      return {
-        verified: isMatch,
-        docId: document.docId,
-        databaseHash: document.currentHash,
-        ledgerHash: ledgerRecord.hash,
-        match: isMatch
-      };
+    return {
+      verified: isMatch,
+      docId: document.docId,
+      databaseHash: document.currentHash,
+      ledgerHash: ledgerRecord.hash,
+      match: isMatch,
+    };
   } catch (err) {
     return {
       verified: false,
       docId: document.docId,
       error: 'Failed to retrieve Fabric record',
-      match: false
+      match: false,
     };
   }
 }

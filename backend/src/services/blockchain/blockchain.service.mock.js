@@ -1,6 +1,6 @@
 'use strict';
 
-const crypto = require('crypto');
+
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const logger = require('../../utils/logger');
 const userRepository = require('../../repositories/userRepository');
@@ -21,7 +21,11 @@ function createError(message, statusCode, errorCode) {
  */
 function validateUUID(id, fieldName) {
   if (!uuidValidate(id)) {
-    throw createError(`Invalid ${fieldName} format`, HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
+    throw createError(
+      `Invalid ${fieldName} format`,
+      HTTP_STATUS.BAD_REQUEST,
+      ERROR_CODES.VALIDATION_ERROR
+    );
   }
 }
 
@@ -40,12 +44,7 @@ const versionHistory = new Map();
 const registeredUsers = new Set();
 const inFlightRegistrations = new Map();
 
-/**
- * Helper: generate a realistic-looking SHA-256 hash.
- */
-function mockHash() {
-  return crypto.randomBytes(32).toString('hex');
-}
+
 
 /**
  * Helper: generate a realistic-looking blockchain transaction ID.
@@ -59,11 +58,11 @@ function mockTxId() {
  */
 async function ensureUserRegistered(userId) {
   validateUUID(userId, 'user ID');
-  
+
   if (registeredUsers.has(userId)) {
     return;
   }
-  
+
   if (inFlightRegistrations.has(userId)) {
     return inFlightRegistrations.get(userId);
   }
@@ -79,7 +78,7 @@ async function ensureUserRegistered(userId) {
       inFlightRegistrations.delete(userId);
     }
   })();
-  
+
   inFlightRegistrations.set(userId, promise);
   return promise;
 }
@@ -96,9 +95,13 @@ async function registerUser(id, role) {
   if (!validRoles.includes(role)) {
     throw createError('Invalid user role', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
   }
-  
+
   if (registeredUsers.has(id)) {
-    throw createError('User is already registered on the blockchain', HTTP_STATUS.CONFLICT, ERROR_CODES.CONFLICT);
+    throw createError(
+      'User is already registered on the blockchain',
+      HTTP_STATUS.CONFLICT,
+      ERROR_CODES.CONFLICT
+    );
   }
 
   logger.info('// MOCK: blockchain.registerUser', { id, role });
@@ -120,20 +123,29 @@ async function recordDocument(docId, hash, metadata, ownerId) {
   if (!hash || typeof hash !== 'string') {
     throw createError('Invalid hash', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
   }
-  if (!metadata || !metadata.filename || !metadata.mimetype || typeof metadata.sizeBytes !== 'number') {
+  if (
+    !metadata ||
+    !metadata.filename ||
+    !metadata.mimetype ||
+    typeof metadata.sizeBytes !== 'number'
+  ) {
     throw createError('Invalid metadata', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
   }
 
   await ensureUserRegistered(ownerId);
 
   if (versionHistory.has(docId)) {
-    throw createError('Document is already recorded on the blockchain', HTTP_STATUS.CONFLICT, ERROR_CODES.CONFLICT);
+    throw createError(
+      'Document is already recorded on the blockchain',
+      HTTP_STATUS.CONFLICT,
+      ERROR_CODES.CONFLICT
+    );
   }
 
   logger.info('// MOCK: blockchain.recordDocument', { docId, ownerId });
   const entry = { hash, metadata, timestamp: new Date().toISOString() };
   versionHistory.set(docId, [entry]);
-  
+
   return { docId, hash, txId: mockTxId() };
 }
 
@@ -150,18 +162,26 @@ async function updateDocument(docId, newHash, metadata) {
     throw createError('Invalid hash', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
   }
   if (!metadata || !metadata.version) {
-    throw createError('Invalid metadata (missing version)', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
+    throw createError(
+      'Invalid metadata (missing version)',
+      HTTP_STATUS.BAD_REQUEST,
+      ERROR_CODES.VALIDATION_ERROR
+    );
   }
 
   if (!versionHistory.has(docId)) {
-    throw createError('Document not found on blockchain', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
+    throw createError(
+      'Document not found on blockchain',
+      HTTP_STATUS.NOT_FOUND,
+      ERROR_CODES.NOT_FOUND
+    );
   }
 
   logger.info('// MOCK: blockchain.updateDocument', { docId });
   const history = versionHistory.get(docId);
   history.push({ hash: newHash, metadata, timestamp: new Date().toISOString() });
   versionHistory.set(docId, history);
-  
+
   return { docId, hash: newHash, txId: mockTxId() };
 }
 
@@ -173,9 +193,13 @@ async function updateDocument(docId, newHash, metadata) {
 async function getDocument(docId) {
   validateUUID(docId, 'document ID');
   if (!versionHistory.has(docId)) {
-    throw createError('Document not found on blockchain', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
+    throw createError(
+      'Document not found on blockchain',
+      HTTP_STATUS.NOT_FOUND,
+      ERROR_CODES.NOT_FOUND
+    );
   }
-  
+
   logger.debug('// MOCK: blockchain.getDocument', { docId });
   const history = versionHistory.get(docId);
   const latest = history[history.length - 1];
@@ -190,9 +214,13 @@ async function getDocument(docId) {
 async function getVersionHistory(docId) {
   validateUUID(docId, 'document ID');
   if (!versionHistory.has(docId)) {
-    throw createError('Document not found on blockchain', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
+    throw createError(
+      'Document not found on blockchain',
+      HTTP_STATUS.NOT_FOUND,
+      ERROR_CODES.NOT_FOUND
+    );
   }
-  
+
   logger.debug('// MOCK: blockchain.getVersionHistory', { docId });
   return versionHistory.get(docId);
 }
@@ -208,18 +236,30 @@ async function grantAccess(docId, userId, permission) {
   validateUUID(docId, 'document ID');
   validateUUID(userId, 'user ID');
   if (permission !== 'READ' && permission !== 'WRITE') {
-    throw createError('Invalid permission type', HTTP_STATUS.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR);
+    throw createError(
+      'Invalid permission type',
+      HTTP_STATUS.BAD_REQUEST,
+      ERROR_CODES.VALIDATION_ERROR
+    );
   }
 
   if (!versionHistory.has(docId)) {
-    throw createError('Document not found on blockchain', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
+    throw createError(
+      'Document not found on blockchain',
+      HTTP_STATUS.NOT_FOUND,
+      ERROR_CODES.NOT_FOUND
+    );
   }
 
   await ensureUserRegistered(userId);
 
   const key = `${docId}:${userId}`;
   if (accessMap.get(key) === permission) {
-    throw createError('Access already granted with this permission', HTTP_STATUS.CONFLICT, ERROR_CODES.CONFLICT);
+    throw createError(
+      'Access already granted with this permission',
+      HTTP_STATUS.CONFLICT,
+      ERROR_CODES.CONFLICT
+    );
   }
 
   logger.info('// MOCK: blockchain.grantAccess', { docId, userId, permission });
@@ -238,7 +278,11 @@ async function revokeAccess(docId, userId) {
   validateUUID(userId, 'user ID');
 
   if (!versionHistory.has(docId)) {
-    throw createError('Document not found on blockchain', HTTP_STATUS.NOT_FOUND, ERROR_CODES.NOT_FOUND);
+    throw createError(
+      'Document not found on blockchain',
+      HTTP_STATUS.NOT_FOUND,
+      ERROR_CODES.NOT_FOUND
+    );
   }
 
   const key = `${docId}:${userId}`;
@@ -287,5 +331,5 @@ module.exports = {
   updateDocument,
   getDocument,
   getVersionHistory,
-  resetMockState
+  resetMockState,
 };

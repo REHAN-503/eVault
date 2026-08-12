@@ -31,17 +31,19 @@ const upload = multer({
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'image/jpeg',
       'image/png',
-      'application/octet-stream' // Required for client-side encrypted blobs
+      'application/octet-stream', // Required for client-side encrypted blobs
     ];
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      const err = new Error('Invalid file type. Only PDF, DOC, DOCX, TXT, JPEG, and PNG are allowed.');
+      const err = new Error(
+        'Invalid file type. Only PDF, DOC, DOCX, TXT, JPEG, and PNG are allowed.'
+      );
       err.statusCode = HTTP_STATUS.BAD_REQUEST;
       err.errorCode = ERROR_CODES.VALIDATION_ERROR;
       cb(err);
     }
-  }
+  },
 });
 
 // All document routes require authentication
@@ -109,11 +111,7 @@ router.post(
  *       200:
  *         description: Paginated document list
  */
-router.get(
-  '/',
-  validateRequest(documentListQuerySchema, 'query'),
-  documentController.list
-);
+router.get('/', validateRequest(documentListQuerySchema, 'query'), documentController.list);
 
 /**
  * @swagger
@@ -138,11 +136,7 @@ router.get(
  *       404:
  *         description: Not found
  */
-router.get(
-  '/:id',
-  validateRequest(documentIdParamSchema, 'params'),
-  documentController.getById
-);
+router.get('/:id', validateRequest(documentIdParamSchema, 'params'), documentController.getById);
 
 /**
  * @swagger
